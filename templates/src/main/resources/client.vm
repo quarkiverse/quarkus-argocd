@@ -1,0 +1,52 @@
+#set ($apiGroup = "")
+#set ($apiVersion = "v1")
+#set ($packageName  = "")
+#foreach ($entry in ${model.entrySet()})
+#set ($packageName  = $entry.getValue().getPackageName())
+#foreach ($annotation in ${entry.getValue().getAnnotations()})
+#if ($annotation.getClassRef().getFullyQualifiedName().equals("io.fabric8.kubernetes.model.annotation.Group"))
+#set ($apiGroup = $annotation.getParameters().get("value").replace(".kubevirt.io","").replace("kubevirt.io", ""))
+#end
+#if ($annotation.getClassRef().getFullyQualifiedName().equals("io.fabric8.kubernetes.model.annotation.Version"))
+#set ($apiVersion = $annotation.getParameters().get("value"))
+#end
+#end
+#end
+package $packageName;
+
+#foreach ($entry in ${model.entrySet()})
+import $entry.getKey();
+import $entry.getKey()List;
+#end
+
+import io.fabric8.kubernetes.client.extension.ClientAdapter;
+import io.fabric8.kubernetes.client.dsl.MixedOperation;
+import io.fabric8.kubernetes.client.dsl.Resource;
+
+
+#set ($apiVersion = $apiVersion.substring(0,1).toUpperCase()+$apiVersion.substring(1))
+#set ($apiGroupLastDotIndex = $apiGroup.lastIndexOf(".") + 1)
+#set ($className = $apiGroup.substring($apiGroupLastDotIndex)+$apiVersion+"DSL")
+#set ($className = $className.substring(0,1).toUpperCase()+$className.substring(1))
+#set ($dslName = "$className")
+#set ($className = $className.replaceAll("DSL$", "Client"))
+public class $className extends ClientAdapter implements $dslName {
+
+  @Override
+  public $className newInstance() {
+    return new $className();
+  }
+
+#foreach ($entry in ${model.entrySet()})
+#set ($plural = $entry.getValue().getName())
+#foreach ($annotation in ${entry.getValue().getAnnotations()})
+#if ($annotation.getClassRef().getFullyQualifiedName().equals("io.fabric8.kubernetes.model.annotation.Plural"))
+#set ($plural = $annotation.getParameters().get("value"))
+  @Override
+  public MixedOperation<${entry.getValue().name}, ${entry.getValue().name}List, Resource<${entry.getValue().name}>> $plural() {
+    return resources(${entry.getValue().name}.class, ${entry.getValue().name}List.class);
+  }
+#end
+#end
+#end
+}
