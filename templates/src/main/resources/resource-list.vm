@@ -1,0 +1,6 @@
+package ${model.packageName};
+
+import io.fabric8.kubernetes.api.model.DefaultKubernetesResourceList;
+
+public class ${model.name}List extends DefaultKubernetesResourceList<${model.name}> {
+}

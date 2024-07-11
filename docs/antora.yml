@@ -1,0 +1,5 @@
+name: quarkus-argocd
+title: Argocd
+version: dev
+nav:
+  - modules/ROOT/nav.adoc
