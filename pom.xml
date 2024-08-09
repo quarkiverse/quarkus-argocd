@@ -35,7 +35,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <quarkus.version>3.12.2</quarkus.version>
         <sundrio.version>0.103.1</sundrio.version>
-        <lombok.version>1.18.26</lombok.version>
+        <lombok.version>1.18.34</lombok.version>
         <kubernetes-client.version>6.13.1</kubernetes-client.version>
         <!-- Formatting Plugins -->
         <formatter-maven-plugin.version>2.23.0</formatter-maven-plugin.version>
