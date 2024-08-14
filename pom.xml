@@ -37,7 +37,7 @@
         <quarkus.version>3.12.2</quarkus.version>
         <sundrio.version>0.103.1</sundrio.version>
         <lombok.version>1.18.26</lombok.version>
-        <kubernetes-client.version>6.13.1</kubernetes-client.version>
+        <kubernetes-client.version>6.13.3</kubernetes-client.version>
         <!-- Formatting Plugins -->
         <formatter-maven-plugin.version>2.23.0</formatter-maven-plugin.version>
         <impsort-maven-plugin.version>1.9.0</impsort-maven-plugin.version>
