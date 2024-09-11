@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>quarkus-argocd-spi</artifactId>
-  <name>Quarkus - argocd - SPI</name>
+  <name>Quarkus ArgoCD - SPI</name>
 
   <dependencies>
     <dependency>

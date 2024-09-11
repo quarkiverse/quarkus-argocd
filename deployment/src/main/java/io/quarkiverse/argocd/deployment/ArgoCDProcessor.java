@@ -11,6 +11,8 @@ import io.quarkiverse.argocd.deployment.utils.Serialization;
 import io.quarkiverse.argocd.spi.CustomArgoCDOutputDirBuildItem;
 import io.quarkiverse.argocd.v1alpha1.Application;
 import io.quarkiverse.argocd.v1alpha1.ApplicationBuilder;
+import io.quarkiverse.argocd.v1alpha1.ApplicationList;
+import io.quarkiverse.argocd.v1alpha1.ApplicationListBuilder;
 import io.quarkus.deployment.IsTest;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
@@ -55,25 +57,25 @@ class ArgoCDProcessor {
                 .orElse(outputTarget.getOutputDirectory().resolve("argocd"));
         Path applicationDeployPath = argocdRoot.resolve(applicationInfo.getName() + "-deploy.yaml");
 
-        List<Application> applicationList = new ArrayList<>();
+        List<Application> generatedApplications = new ArrayList<>();
 
         Application deploy = new ApplicationBuilder()
                 .withNewMetadata()
                 .withName(applicationInfo.getName() + "-deploy")
-                .withNamespace("default")
+                .withNamespace("iocanel")
                 .endMetadata()
                 .withNewSpec()
                 .withProject("default")
                 .withNewDestination()
                 .withServer("https://kubernetes.default.svc")
-                .withNamespace("default")
+                .withNamespace("iocanel")
                 .endDestination()
                 .withNewSource()
-                .withPath(".helm") //TODO: get that from the build items
+                .withPath(".helm/kubernetes/" + applicationInfo.getName()) //TODO: Get target deployment target.
                 .withRepoURL(scmInfo.getDefaultRemoteUrl())
                 .withTargetRevision("HEAD") //We prefer head as it doesn't change on each commit as is the case with sha.
                 .withNewHelm()
-                .withValueFiles(".helm/kubernetes/" + applicationInfo.getName() + "/values.yaml") //TODO: Get target deployment target.
+                .withValueFiles("values.yaml") //TODO: Get target deployment target.
                 .endHelm()
                 .endSource()
                 .withNewSyncPolicy()
@@ -93,7 +95,12 @@ class ArgoCDProcessor {
                 .endSpec()
                 .build();
 
-        applicationList.add(deploy);
+        generatedApplications.add(deploy);
+
+        ApplicationList applicationList = new ApplicationListBuilder()
+                .withItems(generatedApplications)
+                .build();
+
         var str = Serialization.asYaml(applicationList);
         generatedResourceProducer.produce(
                 new GeneratedFileSystemResourceBuildItem(applicationDeployPath.toAbsolutePath().toString(),
