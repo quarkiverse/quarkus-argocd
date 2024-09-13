@@ -2,12 +2,12 @@ package io.quarkiverse.argocd.deployment;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import io.dekorate.utils.Git;
 import io.quarkiverse.argocd.deployment.utils.Serialization;
+import io.quarkiverse.argocd.spi.ArgoCDApplicationListBuildItem;
 import io.quarkiverse.argocd.spi.ArgoCDOutputDirBuildItem;
 import io.quarkiverse.argocd.v1alpha1.Application;
 import io.quarkiverse.argocd.v1alpha1.ApplicationBuilder;
@@ -32,7 +32,7 @@ class ArgoCDProcessor {
         return new FeatureBuildItem(FEATURE);
     }
 
-    @BuildStep(onlyIfNot = IsTest.class)
+    @BuildStep
     public void populateScmInfo(OutputTargetBuildItem outputTarget,
             BuildProducer<ScmInfoBuildItem> scmInfoProducer) {
         Optional<Path> scmRoot = getScmRoot(outputTarget);
@@ -40,30 +40,23 @@ class ArgoCDProcessor {
         scmInfo.filter(s -> !s.getRemote().isEmpty()).ifPresent(s -> scmInfoProducer.produce(s));
     }
 
-    @BuildStep(onlyIfNot = IsTest.class)
+    @BuildStep
     public void customOutputDir(OutputTargetBuildItem outputTarget,
             BuildProducer<ArgoCDOutputDirBuildItem.Effective> outputDirProducer) {
         getScmRoot(outputTarget)
                 .ifPresent(p -> outputDirProducer.produce(new ArgoCDOutputDirBuildItem.Effective(p.resolve(".argocd"))));
     }
 
-    @BuildStep(onlyIfNot = IsTest.class)
+    @BuildStep
     public void build(ApplicationInfoBuildItem applicationInfo,
             List<FeatureBuildItem> features,
-            OutputTargetBuildItem outputTarget,
             ScmInfoBuildItem scmInfo,
-            ArgoCDOutputDirBuildItem.Effective outputDir,
-            BuildProducer<GeneratedFileSystemResourceBuildItem> generatedResourceProducer) {
+            BuildProducer<ArgoCDApplicationListBuildItem> applicationListProducer) {
 
         if (scmInfo == null) {
             Log.warn("No SCM information found. Skipping argocd deployment generation.");
             return;
         }
-
-        Path argocdRoot = outputDir.getOutputDir();
-        Path applicationDeployPath = argocdRoot.resolve(applicationInfo.getName() + "-deploy.yaml");
-
-        List<Application> generatedApplications = new ArrayList<>();
 
         Application deploy = new ApplicationBuilder()
                 .withNewMetadata()
@@ -101,11 +94,22 @@ class ArgoCDProcessor {
                 .endSpec()
                 .build();
 
-        generatedApplications.add(deploy);
-
         ApplicationList applicationList = new ApplicationListBuilder()
-                .withItems(generatedApplications)
+                .withItems(List.of(deploy))
                 .build();
+
+        applicationListProducer.produce(new ArgoCDApplicationListBuildItem(applicationList));
+    }
+
+    @BuildStep(onlyIf = IsTest.class)
+    public void generateApplicationFileSystemResources(ArgoCDApplicationListBuildItem applicationList,
+            ApplicationInfoBuildItem applicationInfo,
+            OutputTargetBuildItem outputTarget,
+            ArgoCDOutputDirBuildItem.Effective outputDir,
+            BuildProducer<GeneratedFileSystemResourceBuildItem> generatedResourceProducer) {
+
+        Path argocdRoot = outputDir.getOutputDir();
+        Path applicationDeployPath = argocdRoot.resolve(applicationInfo.getName() + "-deploy.yaml");
 
         var str = Serialization.asYaml(applicationList);
         generatedResourceProducer.produce(
