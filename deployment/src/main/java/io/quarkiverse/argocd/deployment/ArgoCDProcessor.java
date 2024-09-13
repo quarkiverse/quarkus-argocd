@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import io.dekorate.utils.Git;
 import io.quarkiverse.argocd.deployment.utils.Serialization;
-import io.quarkiverse.argocd.spi.CustomArgoCDOutputDirBuildItem;
+import io.quarkiverse.argocd.spi.ArgoCDOutputDirBuildItem;
 import io.quarkiverse.argocd.v1alpha1.Application;
 import io.quarkiverse.argocd.v1alpha1.ApplicationBuilder;
 import io.quarkiverse.argocd.v1alpha1.ApplicationList;
@@ -41,11 +41,18 @@ class ArgoCDProcessor {
     }
 
     @BuildStep(onlyIfNot = IsTest.class)
+    public void customOutputDir(OutputTargetBuildItem outputTarget,
+            BuildProducer<ArgoCDOutputDirBuildItem.Effective> outputDirProducer) {
+        getScmRoot(outputTarget)
+                .ifPresent(p -> outputDirProducer.produce(new ArgoCDOutputDirBuildItem.Effective(p.resolve(".argocd"))));
+    }
+
+    @BuildStep(onlyIfNot = IsTest.class)
     public void build(ApplicationInfoBuildItem applicationInfo,
             List<FeatureBuildItem> features,
             OutputTargetBuildItem outputTarget,
             ScmInfoBuildItem scmInfo,
-            Optional<CustomArgoCDOutputDirBuildItem> customOutputDir,
+            ArgoCDOutputDirBuildItem.Effective outputDir,
             BuildProducer<GeneratedFileSystemResourceBuildItem> generatedResourceProducer) {
 
         if (scmInfo == null) {
@@ -53,8 +60,7 @@ class ArgoCDProcessor {
             return;
         }
 
-        Path argocdRoot = customOutputDir.map(CustomArgoCDOutputDirBuildItem::getOutputDir)
-                .orElse(outputTarget.getOutputDirectory().resolve("argocd"));
+        Path argocdRoot = outputDir.getOutputDir();
         Path applicationDeployPath = argocdRoot.resolve(applicationInfo.getName() + "-deploy.yaml");
 
         List<Application> generatedApplications = new ArrayList<>();
