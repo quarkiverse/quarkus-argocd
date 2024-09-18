@@ -48,7 +48,8 @@ class ArgoCDProcessor {
     }
 
     @BuildStep
-    public void build(ApplicationInfoBuildItem applicationInfo,
+    public void build(ArgoCDConfiguration config,
+            ApplicationInfoBuildItem applicationInfo,
             List<FeatureBuildItem> features,
             ScmInfoBuildItem scmInfo,
             BuildProducer<ArgoCDApplicationListBuildItem> applicationListProducer) {
@@ -58,23 +59,25 @@ class ArgoCDProcessor {
             return;
         }
 
+        String namespace = config.namespace.or(() -> config.project).orElse(null);
+
         Application deploy = new ApplicationBuilder()
                 .withNewMetadata()
                 .withName(applicationInfo.getName() + "-deploy")
-                .withNamespace("iocanel")
+                .withNamespace(namespace)
                 .endMetadata()
                 .withNewSpec()
-                .withProject("default")
+                .withProject(config.project.orElse("default"))
                 .withNewDestination()
-                .withServer("https://kubernetes.default.svc")
-                .withNamespace("iocanel")
+                .withServer(config.server)
+                .withNamespace(namespace)
                 .endDestination()
                 .withNewSource()
                 .withPath(".helm/kubernetes/" + applicationInfo.getName()) //TODO: Get target deployment target.
                 .withRepoURL(scmInfo.getDefaultRemoteUrl())
-                .withTargetRevision("HEAD") //We prefer head as it doesn't change on each commit as is the case with sha.
+                .withTargetRevision(config.targetRevision)
                 .withNewHelm()
-                .withValueFiles("values.yaml") //TODO: Get target deployment target.
+                .withValueFiles("values.yaml")
                 .endHelm()
                 .endSource()
                 .withNewSyncPolicy()
