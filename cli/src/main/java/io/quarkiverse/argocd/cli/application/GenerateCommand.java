@@ -7,7 +7,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 import io.quarkiverse.argocd.cli.handlers.GetArgoCDApplicationHandler;
@@ -26,7 +25,7 @@ import picocli.CommandLine.ExitCode;
 import picocli.CommandLine.Parameters;
 
 @Command(name = "generate", sortOptions = false, mixinStandardHelpOptions = false, header = "Generate ArgoCD Application.", headerHeading = "%n", commandListHeading = "%nCommands:%n", synopsisHeading = "%nUsage: ", optionListHeading = "%nOptions:%n")
-public class GenerateCommand implements Callable<Integer> {
+public class GenerateCommand extends GenerationBaseCommand {
 
     @Parameters(arity = "0..1", paramLabel = "GENERATION_PATH", description = " The path to generate the ArgoCD Application")
     Optional<String> generationPath = Optional.of(".argocd");
@@ -38,9 +37,11 @@ public class GenerateCommand implements Callable<Integer> {
             System.out.println("Unable to determine the build tool used for the project at " + projectRoot);
             return ExitCode.USAGE;
         }
+
         Path targetDirecotry = projectRoot.resolve(buildTool.getBuildDirectory());
         QuarkusBootstrap quarkusBootstrap = QuarkusBootstrap.builder()
                 .setMode(QuarkusBootstrap.Mode.PROD)
+                .setBuildSystemProperties(getBuildSystemProperties())
                 .setApplicationRoot(getWorkingDirectory())
                 .setProjectRoot(getWorkingDirectory())
                 .setTargetDirectory(targetDirecotry)
@@ -63,12 +64,17 @@ public class GenerateCommand implements Callable<Integer> {
                         System.out.println("No ArgoCD Application generated.");
                         return;
                     }
-                    System.out.println("ArgoCD Applications generated:");
                     Path outputDir = generationPath.map(Paths::get).orElse(Paths.get(".argocd"));
-                    if (!outputDir.toFile().mkdirs()) {
+                    if (outputDir.toFile().exists() && !outputDir.toFile().isDirectory()) {
+                        System.err.println("Output directory is not a directory: " + outputDir);
+                        return;
+                    }
+                    if (!outputDir.toFile().exists() && !outputDir.toFile().mkdirs()) {
                         System.err.println("Failed to create output directory: " + outputDir);
                         return;
                     }
+
+                    System.out.println("ArgoCD Applications generated:");
                     for (Application application : applicationList.getItems()) {
                         String content = Serialization.asYaml(application);
                         Path p = outputDir.resolve(application.getMetadata().getName() + ".yaml");

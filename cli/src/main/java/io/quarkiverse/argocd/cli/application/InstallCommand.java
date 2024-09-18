@@ -7,7 +7,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -26,7 +25,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.ExitCode;
 
 @Command(name = "install", sortOptions = false, mixinStandardHelpOptions = false, header = "Install ArgoCD Application.", headerHeading = "%n", commandListHeading = "%nCommands:%n", synopsisHeading = "%nUsage: ", optionListHeading = "%nOptions:%n")
-public class InstallCommand implements Callable<Integer> {
+public class InstallCommand extends GenerationBaseCommand {
 
     Optional<String> generationPath = Optional.of(".argocd");
 
@@ -40,6 +39,7 @@ public class InstallCommand implements Callable<Integer> {
         Path targetDirecotry = projectRoot.resolve(buildTool.getBuildDirectory());
         QuarkusBootstrap quarkusBootstrap = QuarkusBootstrap.builder()
                 .setMode(QuarkusBootstrap.Mode.PROD)
+                .setBuildSystemProperties(getBuildSystemProperties())
                 .setApplicationRoot(getWorkingDirectory())
                 .setProjectRoot(getWorkingDirectory())
                 .setTargetDirectory(targetDirecotry)
