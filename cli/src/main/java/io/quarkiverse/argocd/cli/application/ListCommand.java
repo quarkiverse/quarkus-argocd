@@ -18,8 +18,7 @@ public class ListCommand extends ApplicationBaseCommand {
     public Integer call() throws Exception {
         KubernetesResourceList<Application> applicationList = kubernetesClient.resources(Application.class).list();
 
-        List<ApplicationListItem> applicationListItems = applicationList.getItems().stream().map(ApplicationListItem::from)
-                .toList();
+        List<ApplicationListItem> applicationListItems = applicationList.getItems().stream().map(ApplicationListItem::from).toList();
         ApplicationListTable table = new ApplicationListTable(applicationListItems);
         System.out.println(table.getContent());
 
