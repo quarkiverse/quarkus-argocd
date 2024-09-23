@@ -2,12 +2,17 @@
 
 [![Version](https://img.shields.io/maven-central/v/io.quarkiverse.argocd/quarkus-argocd?logo=apache-maven&style=flat-square)](https://central.sonatype.com/artifact/io.quarkiverse.argocd/quarkus-argocd-parent)
 
+Generate ArgoCD Application as part of the Quarkus build or the Quarkus CLI.
+
 ## Features
 
 - Generate the ArgoCD Application Kubernetes CR for the Quarkus application
-- Command Line interface to install / unistall and list Application(s)
+- Command Line interface to install / uninstall and list Application(s)
 - Integration with Quarkus Helm
 
+## Requirements
+- Project added under version control
+- A Kubernetes cluster with the ArgoCD Operator installed (supporting `argoproj.io/v1alpha1`).
 
 ## Building
 
@@ -43,13 +48,12 @@ dependencies {
 }
 ```
 
-After this step the ArgoCD CR will be generated under `.argocd` directory in the project root.
-
+After this step the ArgoCD CR will be generated under `.argocd` directory in the project root as part of the build.
 
 ### Using the CLI
 
-The project provides a companion CLI that can be used to install / uninstall and list the applications.
-The CLI can be added with thw following command:
+The project provides a companion CLI that can be used to install / uninstall and list the ArgoCD Applications.
+The CLI can be added with the following command:
 
 ```shell
 quarkus plug add io.quarkiverse.argocd:quarkus-argocd-cli:999-SNAPSHOT
@@ -57,7 +61,7 @@ quarkus plug add io.quarkiverse.argocd:quarkus-argocd-cli:999-SNAPSHOT
 
 #### Regenerating the files:
 
-To re-triggger the file genration:
+To re-triggger the file generation:
 
 ```shell
 quarkus argocd application generate
