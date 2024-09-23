@@ -109,20 +109,22 @@ class ArgoCDProcessor {
         applicationListProducer.produce(new ArgoCDApplicationListBuildItem(applicationList));
     }
 
-    @BuildStep(onlyIf = IsTest.class)
+    @BuildStep(onlyIfNot = IsTest.class)
     public void generateApplicationFileSystemResources(ArgoCDApplicationListBuildItem applicationList,
             ApplicationInfoBuildItem applicationInfo,
             OutputTargetBuildItem outputTarget,
-            ArgoCDOutputDirBuildItem.Effective outputDir,
+            Optional<ArgoCDOutputDirBuildItem.Effective> outputDir,
             BuildProducer<GeneratedFileSystemResourceBuildItem> generatedResourceProducer) {
 
-        Path argocdRoot = outputDir.getOutputDir();
-        Path applicationDeployPath = argocdRoot.resolve(applicationInfo.getName() + "-deploy.yaml");
+        outputDir.ifPresent(dir -> {
+            Path argocdRoot = dir.getOutputDir();
+            Path applicationDeployPath = argocdRoot.resolve(applicationInfo.getName() + "-deploy.yaml");
 
-        var str = Serialization.asYaml(applicationList);
-        generatedResourceProducer.produce(
-                new GeneratedFileSystemResourceBuildItem(applicationDeployPath.toAbsolutePath().toString(),
-                        str.getBytes(StandardCharsets.UTF_8)));
+            var str = Serialization.asYaml(applicationList);
+            generatedResourceProducer.produce(
+                    new GeneratedFileSystemResourceBuildItem(applicationDeployPath.toAbsolutePath().toString(),
+                            str.getBytes(StandardCharsets.UTF_8)));
+        });
     }
 
     /**
