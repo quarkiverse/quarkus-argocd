@@ -2,15 +2,17 @@ package io.quarkiverse.argocd.deployment;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import io.dekorate.utils.Git;
 import io.quarkiverse.argocd.deployment.utils.Serialization;
-import io.quarkiverse.argocd.spi.CustomArgoCDOutputDirBuildItem;
+import io.quarkiverse.argocd.spi.ArgoCDApplicationListBuildItem;
+import io.quarkiverse.argocd.spi.ArgoCDOutputDirBuildItem;
 import io.quarkiverse.argocd.v1alpha1.Application;
 import io.quarkiverse.argocd.v1alpha1.ApplicationBuilder;
+import io.quarkiverse.argocd.v1alpha1.ApplicationList;
+import io.quarkiverse.argocd.v1alpha1.ApplicationListBuilder;
 import io.quarkus.deployment.IsTest;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
@@ -30,7 +32,7 @@ class ArgoCDProcessor {
         return new FeatureBuildItem(FEATURE);
     }
 
-    @BuildStep(onlyIfNot = IsTest.class)
+    @BuildStep
     public void populateScmInfo(OutputTargetBuildItem outputTarget,
             BuildProducer<ScmInfoBuildItem> scmInfoProducer) {
         Optional<Path> scmRoot = getScmRoot(outputTarget);
@@ -38,42 +40,44 @@ class ArgoCDProcessor {
         scmInfo.filter(s -> !s.getRemote().isEmpty()).ifPresent(s -> scmInfoProducer.produce(s));
     }
 
-    @BuildStep(onlyIfNot = IsTest.class)
-    public void build(ApplicationInfoBuildItem applicationInfo,
+    @BuildStep
+    public void customOutputDir(OutputTargetBuildItem outputTarget,
+            BuildProducer<ArgoCDOutputDirBuildItem.Effective> outputDirProducer) {
+        getScmRoot(outputTarget)
+                .ifPresent(p -> outputDirProducer.produce(new ArgoCDOutputDirBuildItem.Effective(p.resolve(".argocd"))));
+    }
+
+    @BuildStep
+    public void build(ArgoCDConfiguration config,
+            ApplicationInfoBuildItem applicationInfo,
             List<FeatureBuildItem> features,
-            OutputTargetBuildItem outputTarget,
             ScmInfoBuildItem scmInfo,
-            Optional<CustomArgoCDOutputDirBuildItem> customOutputDir,
-            BuildProducer<GeneratedFileSystemResourceBuildItem> generatedResourceProducer) {
+            BuildProducer<ArgoCDApplicationListBuildItem> applicationListProducer) {
 
         if (scmInfo == null) {
             Log.warn("No SCM information found. Skipping argocd deployment generation.");
             return;
         }
 
-        Path argocdRoot = customOutputDir.map(CustomArgoCDOutputDirBuildItem::getOutputDir)
-                .orElse(outputTarget.getOutputDirectory().resolve("argocd"));
-        Path applicationDeployPath = argocdRoot.resolve(applicationInfo.getName() + "-deploy.yaml");
-
-        List<Application> applicationList = new ArrayList<>();
+        String namespace = config.namespace.or(() -> config.project).orElse(null);
 
         Application deploy = new ApplicationBuilder()
                 .withNewMetadata()
                 .withName(applicationInfo.getName() + "-deploy")
-                .withNamespace("default")
+                .withNamespace(namespace)
                 .endMetadata()
                 .withNewSpec()
-                .withProject("default")
+                .withProject(config.project.orElse("default"))
                 .withNewDestination()
-                .withServer("https://kubernetes.default.svc")
-                .withNamespace("default")
+                .withServer(config.server)
+                .withNamespace(namespace)
                 .endDestination()
                 .withNewSource()
-                .withPath(".helm") //TODO: get that from the build items
+                .withPath(".helm/kubernetes/" + applicationInfo.getName()) //TODO: Get target deployment target.
                 .withRepoURL(scmInfo.getDefaultRemoteUrl())
-                .withTargetRevision("HEAD") //We prefer head as it doesn't change on each commit as is the case with sha.
+                .withTargetRevision(config.targetRevision)
                 .withNewHelm()
-                .withValueFiles(".helm/kubernetes/" + applicationInfo.getName() + "/values.yaml") //TODO: Get target deployment target.
+                .withValueFiles("values.yaml")
                 .endHelm()
                 .endSource()
                 .withNewSyncPolicy()
@@ -93,7 +97,23 @@ class ArgoCDProcessor {
                 .endSpec()
                 .build();
 
-        applicationList.add(deploy);
+        ApplicationList applicationList = new ApplicationListBuilder()
+                .withItems(List.of(deploy))
+                .build();
+
+        applicationListProducer.produce(new ArgoCDApplicationListBuildItem(applicationList));
+    }
+
+    @BuildStep(onlyIf = IsTest.class)
+    public void generateApplicationFileSystemResources(ArgoCDApplicationListBuildItem applicationList,
+            ApplicationInfoBuildItem applicationInfo,
+            OutputTargetBuildItem outputTarget,
+            ArgoCDOutputDirBuildItem.Effective outputDir,
+            BuildProducer<GeneratedFileSystemResourceBuildItem> generatedResourceProducer) {
+
+        Path argocdRoot = outputDir.getOutputDir();
+        Path applicationDeployPath = argocdRoot.resolve(applicationInfo.getName() + "-deploy.yaml");
+
         var str = Serialization.asYaml(applicationList);
         generatedResourceProducer.produce(
                 new GeneratedFileSystemResourceBuildItem(applicationDeployPath.toAbsolutePath().toString(),

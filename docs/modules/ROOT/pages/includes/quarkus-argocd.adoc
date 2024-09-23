@@ -1,0 +1,80 @@
+
+:summaryTableId: quarkus-argocd
+[.configuration-legend]
+icon:lock[title=Fixed at build time] Configuration property fixed at build time - All other configuration properties are overridable at runtime
+[.configuration-reference.searchable, cols="80,.^10,.^10"]
+|===
+
+h|[[quarkus-argocd_configuration]]link:#quarkus-argocd_configuration[Configuration property]
+
+h|Type
+h|Default
+
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-server]]`link:#quarkus-argocd_quarkus-argocd-server[quarkus.argocd.server]`
+
+
+[.description]
+--
+The Kubernetes API Server URL.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_SERVER+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_ARGOCD_SERVER+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|`https://kubernetes.default.svc`
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-project]]`link:#quarkus-argocd_quarkus-argocd-project[quarkus.argocd.project]`
+
+
+[.description]
+--
+The ArgoCDD project.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_PROJECT+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_ARGOCD_PROJECT+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-namespace]]`link:#quarkus-argocd_quarkus-argocd-namespace[quarkus.argocd.namespace]`
+
+
+[.description]
+--
+The target namespace.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_NAMESPACE+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_ARGOCD_NAMESPACE+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-target-revision]]`link:#quarkus-argocd_quarkus-argocd-target-revision[quarkus.argocd.target-revision]`
+
+
+[.description]
+--
+The target revision. Defaults to HEAD.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_TARGET_REVISION+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_ARGOCD_TARGET_REVISION+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|`HEAD`
+
+|===

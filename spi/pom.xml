@@ -8,13 +8,19 @@
   </parent>
 
   <artifactId>quarkus-argocd-spi</artifactId>
-  <name>Quarkus - argocd - SPI</name>
+  <name>Quarkus ArgoCD - SPI</name>
 
   <dependencies>
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-core-deployment</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>quarkus-argocd-model-v1alpha1</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
   </dependencies>
   <build>
     <plugins>
