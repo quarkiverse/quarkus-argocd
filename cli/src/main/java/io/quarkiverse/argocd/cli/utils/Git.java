@@ -76,9 +76,7 @@ public final class Git {
     public static boolean hasUncommittedChanges() {
         return getScmRoot().map(root -> {
             try (org.eclipse.jgit.api.Git git = org.eclipse.jgit.api.Git.open(root.toFile())) {
-                boolean clean = git.status().call().isClean();
-                System.out.println("Git repository " + (clean ? "does not have" : "has") + " uncommitted changes.");
-                return clean;
+                return git.status().call().isClean();
             } catch (IOException | GitAPIException e) {
                 return false;
             }
