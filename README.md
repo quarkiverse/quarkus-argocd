@@ -2,26 +2,89 @@
 
 [![Version](https://img.shields.io/maven-central/v/io.quarkiverse.argocd/quarkus-argocd?logo=apache-maven&style=flat-square)](https://central.sonatype.com/artifact/io.quarkiverse.argocd/quarkus-argocd-parent)
 
-## Welcome to Quarkiverse!
+## Features
 
-Congratulations and thank you for creating a new Quarkus extension project in Quarkiverse!
+- Generate the ArgoCD Application Kubernetes CR for the Quarkus application
+- Command Line interface to install / unistall and list Application(s)
+- Integration with Quarkus Helm
 
-Feel free to replace this content with the proper description of your new project and necessary instructions how to use and contribute to it.
 
-You can find the basic info, Quarkiverse policies and conventions in [the Quarkiverse wiki](https://github.com/quarkiverse/quarkiverse/wiki).
+## Building
 
-In case you are creating a Quarkus extension project for the first time, please follow [Building My First Extension](https://quarkus.io/guides/building-my-first-extension) guide.
+To build the extension use the following command:
 
-Other useful articles related to Quarkus extension development can be found under the [Writing Extensions](https://quarkus.io/guides/#writing-extensions) guide category on the [Quarkus.io](https://quarkus.io) website.
+```shell
+mvn clean install
+```
 
-Thanks again, good luck and have fun!
+## Usage
 
-## Documentation
+To get the the argocd custom resources generated one needs to add the `quarkus-argocd` extension to the project.
 
-The documentation for this extension should be maintained as part of this repository and it is stored in the `docs/` directory.
+### Add extension to your project 
 
-The layout should follow the [Antora's Standard File and Directory Set](https://docs.antora.org/antora/2.3/standard-directories/).
+To add the extension to the project you to manually edit the `pom.xml` / `build.gradle` file.
 
-Once the docs are ready to be published, please open a PR including this repository in the [Quarkiverse Docs Antora playbook](https://github.com/quarkiverse/quarkiverse-docs/blob/main/antora-playbook.yml#L7). See an example [here](https://github.com/quarkiverse/quarkiverse-docs/pull/1)
+#### Manually editing the `pom.xml` file
 
-Your documentation will then be published to the https://docs.quarkiverse.io/ website.
+```xml
+<dependency>
+    <groupId>io.quarkiverse.argocd</groupId>
+    <artifactId>quarkus-argocd</artifactId>
+    <version>999-SNAPSHOT</version>
+</dependency>
+```
+
+#### Manually editing the `build.gradle` file
+
+```groovy
+dependencies {
+    implementation 'io.quarkiverse.argocd:quarkus-argocd:999-SNAPSHOT'
+}
+```
+
+After this step the ArgoCD CR will be generated under `.argocd` directory in the project root.
+
+
+### Using the CLI
+
+The project provides a companion CLI that can be used to install / uninstall and list the applications.
+The CLI can be added with thw following command:
+
+```shell
+quarkus plug add io.quarkiverse.argocd:quarkus-argocd-cli:999-SNAPSHOT
+```
+
+#### Regenerating the files:
+
+To re-triggger the file genration:
+
+```shell
+quarkus argocd application generate
+```
+
+#### Installing the application
+
+To install generated `Application` CR to the currently connected Kubernetes cluster:
+
+```shell
+quarkus argocd application install
+```
+**Note**: In case of uncommited or unpushed changes the command will prompt users to decide if they want to proceed with the installation.
+
+The `currently connected Kubernetes cluster` is the one that is configured in the `~/.kube/config` file.
+It can be overriden by setting in `applcation.properties` a different API server url and token. See the `quarkus-kubernetes-client` extension for more details.
+
+To uninstall:
+
+```shell
+quarkus argocd application uninstall
+```
+
+#### Listing installed applications
+
+To list all Applications installed
+
+```shell
+quarkus argocd application list
+```
