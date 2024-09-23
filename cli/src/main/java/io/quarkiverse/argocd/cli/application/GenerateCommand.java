@@ -1,7 +1,5 @@
 package io.quarkiverse.argocd.cli.application;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -90,15 +88,26 @@ public class GenerateCommand extends GenerationBaseCommand {
         return ExitCode.OK;
     }
 
-    private void writeStringSafe(Path p, String content) {
-        try {
-            Files.writeString(p, content);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    @Override
+    public void process(ApplicationList applicationList) {
+        Path outputDir = generationPath.map(Paths::get).orElse(Paths.get(".argocd"));
+        if (outputDir.toFile().exists() && !outputDir.toFile().isDirectory()) {
+            System.err.println("Output directory is not a directory: " + outputDir);
+            return;
         }
+        if (!outputDir.toFile().exists() && !outputDir.toFile().mkdirs()) {
+            System.err.println("Failed to create output directory: " + outputDir);
+            return;
+        }
+
+        System.out.println("ArgoCD Applications generated:");
+        for (Application application : applicationList.getItems()) {
+            String content = Serialization.asYaml(application);
+            Path p = outputDir.resolve(application.getMetadata().getName() + ".yaml");
+            writeStringSafe(p, content);
+            System.out.println(application.getMetadata().getName());
+        }
+
     }
 
-    private Path getWorkingDirectory() {
-        return Paths.get(System.getProperty("user.dir"));
-    }
 }
