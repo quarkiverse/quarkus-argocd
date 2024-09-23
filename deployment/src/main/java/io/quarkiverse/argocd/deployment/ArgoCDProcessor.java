@@ -2,6 +2,7 @@ package io.quarkiverse.argocd.deployment;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +14,7 @@ import io.quarkiverse.argocd.v1alpha1.Application;
 import io.quarkiverse.argocd.v1alpha1.ApplicationBuilder;
 import io.quarkiverse.argocd.v1alpha1.ApplicationList;
 import io.quarkiverse.argocd.v1alpha1.ApplicationListBuilder;
+import io.quarkiverse.helm.spi.CustomHelmOutputDirBuildItem;
 import io.quarkus.deployment.IsTest;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
@@ -52,6 +54,7 @@ class ArgoCDProcessor {
             ApplicationInfoBuildItem applicationInfo,
             List<FeatureBuildItem> features,
             ScmInfoBuildItem scmInfo,
+            Optional<CustomHelmOutputDirBuildItem> customHelmOutputDir,
             BuildProducer<ArgoCDApplicationListBuildItem> applicationListProducer) {
 
         if (scmInfo == null) {
@@ -60,6 +63,7 @@ class ArgoCDProcessor {
         }
 
         String namespace = config.namespace.or(() -> config.project).orElse(null);
+        Path helmOutputDir = customHelmOutputDir.map(CustomHelmOutputDirBuildItem::getOutputDir).orElse(Paths.get(".helm"));
 
         // @formatter:off
         Application deploy = new ApplicationBuilder()
@@ -74,7 +78,7 @@ class ArgoCDProcessor {
                     .withNamespace(namespace)
                   .endDestination()
                   .withNewSource()
-                    .withPath(".helm/kubernetes/" + applicationInfo.getName()) //TODO: Get target deployment target.
+                    .withPath(helmOutputDir.resolve("kubernetes").resolve(applicationInfo.getName()).toString()) //TODO: Get target deployment target.
                     .withRepoURL(scmInfo.getDefaultRemoteUrl())
                     .withTargetRevision(config.targetRevision)
                     .withNewHelm()
