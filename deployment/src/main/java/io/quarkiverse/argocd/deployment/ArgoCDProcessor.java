@@ -6,6 +6,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
+import org.jboss.logging.Logger;
+
 import io.dekorate.utils.Git;
 import io.quarkiverse.argocd.deployment.utils.Serialization;
 import io.quarkiverse.argocd.spi.ArgoCDApplicationListBuildItem;
@@ -22,12 +24,12 @@ import io.quarkus.deployment.builditem.ApplicationInfoBuildItem;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.GeneratedFileSystemResourceBuildItem;
 import io.quarkus.deployment.pkg.builditem.OutputTargetBuildItem;
-import io.quarkus.logging.Log;
 
 class ArgoCDProcessor {
 
     private static final String FEATURE = "argocd";
     private static final String DOT_GIT = ".git";
+    private static final Logger log = Logger.getLogger(ArgoCDProcessor.class);
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -58,7 +60,7 @@ class ArgoCDProcessor {
             BuildProducer<ArgoCDApplicationListBuildItem> applicationListProducer) {
 
         if (scmInfo == null) {
-            Log.warn("No SCM information found. Skipping argocd deployment generation.");
+            log.warn("No SCM information found. Skipping argocd deployment generation.");
             return;
         }
 
