@@ -20,6 +20,11 @@
         <artifactId>quarkus-jackson-deployment</artifactId>
       </dependency>
       <dependency>
+        <groupId>io.quarkiverse.helm</groupId>
+        <artifactId>quarkus-helm-deployment</artifactId>
+        <version>${quarkus-helm.version}</version>
+      </dependency>
+      <dependency>
         <groupId>com.fasterxml.jackson.dataformat</groupId>
         <artifactId>jackson-dataformat-yaml</artifactId>
       </dependency>

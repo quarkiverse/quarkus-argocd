@@ -2,8 +2,11 @@ package io.quarkiverse.argocd.deployment;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+
+import org.jboss.logging.Logger;
 
 import io.dekorate.utils.Git;
 import io.quarkiverse.argocd.deployment.utils.Serialization;
@@ -13,6 +16,7 @@ import io.quarkiverse.argocd.v1alpha1.Application;
 import io.quarkiverse.argocd.v1alpha1.ApplicationBuilder;
 import io.quarkiverse.argocd.v1alpha1.ApplicationList;
 import io.quarkiverse.argocd.v1alpha1.ApplicationListBuilder;
+import io.quarkiverse.helm.spi.CustomHelmOutputDirBuildItem;
 import io.quarkus.deployment.IsTest;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
@@ -20,12 +24,12 @@ import io.quarkus.deployment.builditem.ApplicationInfoBuildItem;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.GeneratedFileSystemResourceBuildItem;
 import io.quarkus.deployment.pkg.builditem.OutputTargetBuildItem;
-import io.quarkus.logging.Log;
 
 class ArgoCDProcessor {
 
     private static final String FEATURE = "argocd";
     private static final String DOT_GIT = ".git";
+    private static final Logger log = Logger.getLogger(ArgoCDProcessor.class);
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -52,14 +56,16 @@ class ArgoCDProcessor {
             ApplicationInfoBuildItem applicationInfo,
             List<FeatureBuildItem> features,
             ScmInfoBuildItem scmInfo,
+            Optional<CustomHelmOutputDirBuildItem> customHelmOutputDir,
             BuildProducer<ArgoCDApplicationListBuildItem> applicationListProducer) {
 
         if (scmInfo == null) {
-            Log.warn("No SCM information found. Skipping argocd deployment generation.");
+            log.warn("No SCM information found. Skipping argocd deployment generation.");
             return;
         }
 
         String namespace = config.namespace.or(() -> config.project).orElse(null);
+        Path helmOutputDir = customHelmOutputDir.map(CustomHelmOutputDirBuildItem::getOutputDir).orElse(Paths.get(".helm"));
 
         // @formatter:off
         Application deploy = new ApplicationBuilder()
@@ -74,7 +80,7 @@ class ArgoCDProcessor {
                     .withNamespace(namespace)
                   .endDestination()
                   .withNewSource()
-                    .withPath(".helm/kubernetes/" + applicationInfo.getName()) //TODO: Get target deployment target.
+                    .withPath(helmOutputDir.resolve("kubernetes").resolve(applicationInfo.getName()).toString()) //TODO: Get target deployment target.
                     .withRepoURL(scmInfo.getDefaultRemoteUrl())
                     .withTargetRevision(config.targetRevision)
                     .withNewHelm()
@@ -105,20 +111,22 @@ class ArgoCDProcessor {
         applicationListProducer.produce(new ArgoCDApplicationListBuildItem(applicationList));
     }
 
-    @BuildStep(onlyIf = IsTest.class)
+    @BuildStep(onlyIfNot = IsTest.class)
     public void generateApplicationFileSystemResources(ArgoCDApplicationListBuildItem applicationList,
             ApplicationInfoBuildItem applicationInfo,
             OutputTargetBuildItem outputTarget,
-            ArgoCDOutputDirBuildItem.Effective outputDir,
+            Optional<ArgoCDOutputDirBuildItem.Effective> outputDir,
             BuildProducer<GeneratedFileSystemResourceBuildItem> generatedResourceProducer) {
 
-        Path argocdRoot = outputDir.getOutputDir();
-        Path applicationDeployPath = argocdRoot.resolve(applicationInfo.getName() + "-deploy.yaml");
+        outputDir.ifPresent(dir -> {
+            Path argocdRoot = dir.getOutputDir();
+            Path applicationDeployPath = argocdRoot.resolve(applicationInfo.getName() + "-deploy.yaml");
 
-        var str = Serialization.asYaml(applicationList);
-        generatedResourceProducer.produce(
-                new GeneratedFileSystemResourceBuildItem(applicationDeployPath.toAbsolutePath().toString(),
-                        str.getBytes(StandardCharsets.UTF_8)));
+            var str = Serialization.asYaml(applicationList);
+            generatedResourceProducer.produce(
+                    new GeneratedFileSystemResourceBuildItem(applicationDeployPath.toAbsolutePath().toString(),
+                            str.getBytes(StandardCharsets.UTF_8)));
+        });
     }
 
     /**

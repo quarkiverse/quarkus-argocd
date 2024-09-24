@@ -19,6 +19,11 @@
           <groupId>io.quarkus</groupId>
           <artifactId>quarkus-jackson</artifactId>
         </dependency>
+        <dependency>
+          <groupId>io.quarkiverse.helm</groupId>
+          <artifactId>quarkus-helm</artifactId>
+          <version>${quarkus-helm.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
