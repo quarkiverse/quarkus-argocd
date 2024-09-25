@@ -159,7 +159,7 @@ public final class Git {
         });
     }
 
-    private static Optional<Path> getScmRoot() {
+    public static Optional<Path> getScmRoot() {
         Path dir = Paths.get("").toAbsolutePath();
         while (dir != null && !dir.resolve(DOT_GIT).toFile().exists()) {
             dir = dir.getParent();
