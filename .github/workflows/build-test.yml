@@ -79,7 +79,7 @@ jobs:
           
           git config user.email "coder@quarkus.io"
           git config user.name "Quarkus coder"
-          git remote add origin git@github.com:quarkiverse/code-with-quarkus.git
+          git remote add origin https://github.com/quarkiverse/code-with-quarkus.git
           
           git add .
           git commit -asm "Initial upload"
