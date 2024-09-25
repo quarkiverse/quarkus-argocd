@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.Callable;
@@ -45,6 +46,12 @@ public abstract class GenerationBaseCommand extends ApplicationBaseCommand imple
         Optional<Path> scmRoot = Git.getScmRoot();
         if (scmRoot.isEmpty()) {
             System.out.println("Unable to determine the SCM root for the project at " + projectRoot + ". Aborting.");
+            return ExitCode.USAGE;
+        }
+
+        Map<String, String> remotes = Git.getRemotes(scmRoot.get());
+        if (remotes.isEmpty()) {
+            System.out.println("Unable to determine the SCM remotes for the project at " + projectRoot + ". Aborting.");
             return ExitCode.USAGE;
         }
 
