@@ -12,6 +12,7 @@ import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 import io.quarkiverse.argocd.cli.handlers.GetArgoCDApplicationHandler;
+import io.quarkiverse.argocd.cli.utils.Git;
 import io.quarkiverse.argocd.spi.ArgoCDApplicationListBuildItem;
 import io.quarkiverse.argocd.v1alpha1.ApplicationList;
 import io.quarkus.bootstrap.BootstrapException;
@@ -40,6 +41,13 @@ public abstract class GenerationBaseCommand extends ApplicationBaseCommand imple
 
     public Integer call() {
         Path projectRoot = getWorkingDirectory();
+
+        Optional<Path> scmRoot = Git.getScmRoot();
+        if (scmRoot.isEmpty()) {
+            System.out.println("Unable to determine the SCM root for the project at " + projectRoot + ". Aborting.");
+            return ExitCode.USAGE;
+        }
+
         BuildTool buildTool = QuarkusProjectHelper.detectExistingBuildTool(projectRoot);
         if (buildTool == null) {
             System.out.println("Unable to determine the build tool used for the project at " + projectRoot);
