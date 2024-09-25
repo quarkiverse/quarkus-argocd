@@ -1,0 +1,109 @@
+name: Build and test the plugin
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "main"
+    paths-ignore:
+      - '.gitignore'
+      - 'CODEOWNERS'
+      - 'LICENSE'
+      - '*.md'
+      - '*.adoc'
+      - '*.txt'
+      - '.all-contributorsrc'
+  pull_request:
+    paths-ignore:
+      - '.gitignore'
+      - 'CODEOWNERS'
+      - 'LICENSE'
+      - '*.md'
+      - '*.adoc'
+      - '*.txt'
+      - '.all-contributorsrc'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  QUARKUS_CLI_VERSION: 3.14.4
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        #        os: [windows-latest, macos-latest, ubuntu-latest]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: 'maven'
+
+      - name: Build with Maven
+        run: mvn -B clean install -Dno-format
+
+      - name: Install Quarkus CLI and register the plugin
+        run: |
+          echo "## Install quarkus CLI"
+          curl -sL https://repo.maven.apache.org/maven2/io/quarkus/quarkus-cli/$QUARKUS_CLI_VERSION/quarkus-cli-$QUARKUS_CLI_VERSION-runner.jar -o quarkus-cli.jar
+          java -jar quarkus-cli.jar version
+
+      - name: Create a quarkus project and generate the Argo CD yaml file
+        run: |
+          echo "## Create a quarkus alias"
+          shopt -s expand_aliases
+          alias quarkus="java -jar ${GITHUB_WORKSPACE}/quarkus-cli.jar"
+          
+          echo "## Create a Quarkus project"
+          quarkus create app
+          cd code-with-quarkus
+          
+          echo "## Init a git repository and push the code"
+          git init
+          
+          git config user.email "coder@quarkus.io"
+          git config user.name "Quarkus coder"
+          git remote add origin git@github.com:quarkiverse/code-with-quarkus.git
+          
+          git add .
+          git commit -asm "Initial upload"
+          
+          echo "## Register the plugin"
+          quarkus plug add io.quarkiverse.argocd:quarkus-argocd-cli:999-SNAPSHOT
+          quarkus plug ls
+          
+          echo "## Compile the quarkus app"
+          mvn -B install -Dno-format
+          
+          echo "## Generate the Argo CD application"
+          quarkus argocd application generate
+          
+          echo "## Check if the file has been generated ..."
+          if [ -f ".argocd/code-with-quarkus-deploy.yaml" ]; then
+            echo "Argo CD file has been generated"
+          else
+            echo "Argo CD file has not been generated"
+            ls -la .argocd
+            exit 1
+          fi 
+          
+          if yq eval '.applicationList.items[].spec.source.repoURL' ".argocd/code-with-quarkus-deploy.yaml" > /dev/null; then
+            echo "repoURL field exists within the generated Argo CD generated file !"
+          else
+            echo "## ArgoCD file has not been generated properly !"
+            cat ".argocd/code-with-quarkus-deploy.yaml"
+            exit 1
+          fi
