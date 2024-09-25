@@ -3,6 +3,7 @@ package io.quarkiverse.argocd.cli.utils;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.jgit.api.FetchCommand;
@@ -157,6 +158,16 @@ public final class Git {
                 return Optional.<String> empty();
             }
         });
+    }
+
+    /**
+     * Get the git remote urls as a map.
+     *
+     * @param path the path to the git config.
+     * @return A {@link Map} of urls per remote.
+     */
+    public static Map<String, String> getRemotes(Path path) {
+        return io.dekorate.utils.Git.getRemotes(path);
     }
 
     public static Optional<Path> getScmRoot() {
