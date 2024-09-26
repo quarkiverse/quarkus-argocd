@@ -12,6 +12,7 @@ import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
+import io.dekorate.utils.Strings;
 import io.quarkiverse.argocd.cli.handlers.GetArgoCDApplicationHandler;
 import io.quarkiverse.argocd.cli.utils.Git;
 import io.quarkiverse.argocd.spi.ArgoCDApplicationListBuildItem;
@@ -22,10 +23,14 @@ import io.quarkus.bootstrap.app.CuratedApplication;
 import io.quarkus.bootstrap.app.QuarkusBootstrap;
 import io.quarkus.devtools.project.BuildTool;
 import io.quarkus.devtools.project.QuarkusProjectHelper;
+import io.quarkus.maven.dependency.ArtifactDependency;
 import picocli.CommandLine.ExitCode;
 import picocli.CommandLine.Option;
 
 public abstract class GenerationBaseCommand extends ApplicationBaseCommand implements Callable<Integer> {
+
+    private static final ArtifactDependency QUARKUS_ARGOCD = new ArtifactDependency("io.quarkiverse.argocd", "quarkus-argocd",
+            null, "jar", GenerationBaseCommand.getVersion());
 
     @Option(names = { "-n", "--namespace" }, description = "The target namespace")
     Optional<String> namespace = Optional.empty();
@@ -68,9 +73,12 @@ public abstract class GenerationBaseCommand extends ApplicationBaseCommand imple
                 .setApplicationRoot(getWorkingDirectory())
                 .setProjectRoot(getWorkingDirectory())
                 .setTargetDirectory(targetDirecotry)
-                .setLocalProjectDiscovery(true)
                 .setIsolateDeployment(false)
+                .setRebuild(true)
+                .setLocalProjectDiscovery(true)
                 .setBaseClassLoader(ClassLoader.getSystemClassLoader())
+                .setForcedDependencies(List.of(QUARKUS_ARGOCD))
+                .setDependencyInfoProvider(null)
                 .build();
 
         List<String> resultBuildItemFQCNs = new ArrayList<>();
@@ -111,5 +119,9 @@ public abstract class GenerationBaseCommand extends ApplicationBaseCommand imple
 
     protected Path getWorkingDirectory() {
         return Paths.get(System.getProperty("user.dir"));
+    }
+
+    private static String getVersion() {
+        return Strings.read(GenerationBaseCommand.class.getClassLoader().getResourceAsStream("version"));
     }
 }
