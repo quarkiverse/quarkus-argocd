@@ -1,4 +1,4 @@
-name: Build and test the plugin
+name: CLI integration test
 
 on:
   workflow_dispatch:
@@ -68,6 +68,9 @@ jobs:
           alias quarkus="java -jar ${GITHUB_WORKSPACE}/quarkus-cli.jar"
           
           echo "## Create a Quarkus project"
+
+          TMP_DIR=$(mktemp -d)
+          pushd $TMP_DIR
           quarkus create app
           cd code-with-quarkus
           
@@ -76,7 +79,7 @@ jobs:
           
           git config user.email "coder@quarkus.io"
           git config user.name "Quarkus coder"
-          git remote add origin git@github.com:quarkiverse/code-with-quarkus.git
+          git remote add origin https://github.com/quarkiverse/code-with-quarkus.git
           
           git add .
           git commit -asm "Initial upload"
@@ -87,6 +90,10 @@ jobs:
           
           echo "## Compile the quarkus app"
           mvn -B install -Dno-format
+
+          # Troubleshooting information
+          ls -al
+          git log
           
           echo "## Generate the Argo CD application"
           quarkus argocd application generate
@@ -107,3 +114,4 @@ jobs:
             cat ".argocd/code-with-quarkus-deploy.yaml"
             exit 1
           fi
+          popd
