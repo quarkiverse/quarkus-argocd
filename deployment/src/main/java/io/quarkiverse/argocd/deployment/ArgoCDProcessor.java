@@ -65,6 +65,8 @@ class ArgoCDProcessor {
         }
 
         String namespace = config.namespace.or(() -> config.project).orElse(null);
+        String applicationNamespace = config.applicationNamespace.or(() -> config.namespace).orElse(null);
+
         Path helmOutputDir = customHelmOutputDir.map(CustomHelmOutputDirBuildItem::getOutputDir).orElse(Paths.get(".helm"));
 
         // @formatter:off
@@ -77,7 +79,7 @@ class ArgoCDProcessor {
                   .withProject(config.project.orElse("default"))
                   .withNewDestination()
                     .withServer(config.server)
-                    .withNamespace(namespace)
+                    .withNamespace(applicationNamespace)
                   .endDestination()
                   .withNewSource()
                     .withPath(helmOutputDir.resolve("kubernetes").resolve(applicationInfo.getName()).toString()) //TODO: Get target deployment target.
