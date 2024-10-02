@@ -33,4 +33,11 @@ public class ArgoCDConfiguration {
     @ConfigItem(defaultValue = "HEAD")
     String targetRevision;
 
+    /**
+     *
+     * The namespace that the actual application deployment will be created in.
+     */
+    @ConfigItem
+    Optional<String> applicationNamespace;
+
 }
