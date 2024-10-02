@@ -9,13 +9,13 @@ import java.util.Optional;
 import org.jboss.logging.Logger;
 
 import io.dekorate.utils.Git;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.quarkiverse.argocd.deployment.utils.Serialization;
-import io.quarkiverse.argocd.spi.ArgoCDApplicationListBuildItem;
 import io.quarkiverse.argocd.spi.ArgoCDOutputDirBuildItem;
+import io.quarkiverse.argocd.spi.ArgoCDResourceListBuildItem;
 import io.quarkiverse.argocd.v1alpha1.Application;
 import io.quarkiverse.argocd.v1alpha1.ApplicationBuilder;
-import io.quarkiverse.argocd.v1alpha1.ApplicationList;
-import io.quarkiverse.argocd.v1alpha1.ApplicationListBuilder;
+import io.quarkiverse.argocd.v1alpha1.ArgoCDResourceList;
 import io.quarkiverse.helm.spi.CustomHelmOutputDirBuildItem;
 import io.quarkus.deployment.IsTest;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -57,7 +57,7 @@ class ArgoCDProcessor {
             List<FeatureBuildItem> features,
             ScmInfoBuildItem scmInfo,
             Optional<CustomHelmOutputDirBuildItem> customHelmOutputDir,
-            BuildProducer<ArgoCDApplicationListBuildItem> applicationListProducer) {
+            BuildProducer<ArgoCDResourceListBuildItem> resourceListProducer) {
 
         if (scmInfo == null) {
             log.warn("No SCM information found. Skipping argocd deployment generation.");
@@ -76,7 +76,7 @@ class ArgoCDProcessor {
                   .withNamespace(namespace)
                 .endMetadata()
                 .withNewSpec()
-                  .withProject(config.project.orElse("default"))
+                  .withProject(config.project.orElse(applicationInfo.getName()))
                   .withNewDestination()
                     .withServer(config.server)
                     .withNamespace(applicationNamespace)
@@ -106,15 +106,15 @@ class ArgoCDProcessor {
                 .endSpec()
                 .build();
         // @formatter:on
-        ApplicationList applicationList = new ApplicationListBuilder()
-                .withItems(List.of(deploy))
-                .build();
 
-        applicationListProducer.produce(new ArgoCDApplicationListBuildItem(applicationList));
+        ArgoCDResourceList<HasMetadata> resourceList = new ArgoCDResourceList<>();
+        resourceList.setItems(List.of(deploy));
+
+        resourceListProducer.produce(new ArgoCDResourceListBuildItem(resourceList));
     }
 
     @BuildStep(onlyIfNot = IsTest.class)
-    public void generateApplicationFileSystemResources(ArgoCDApplicationListBuildItem applicationList,
+    public void generateApplicationFileSystemResources(ArgoCDResourceListBuildItem resourceList,
             ApplicationInfoBuildItem applicationInfo,
             OutputTargetBuildItem outputTarget,
             Optional<ArgoCDOutputDirBuildItem.Effective> outputDir,
@@ -124,7 +124,7 @@ class ArgoCDProcessor {
             Path argocdRoot = dir.getOutputDir();
             Path applicationDeployPath = argocdRoot.resolve(applicationInfo.getName() + "-deploy.yaml");
 
-            var str = Serialization.asYaml(applicationList);
+            var str = Serialization.asYaml(resourceList);
             generatedResourceProducer.produce(
                     new GeneratedFileSystemResourceBuildItem(applicationDeployPath.toAbsolutePath().toString(),
                             str.getBytes(StandardCharsets.UTF_8)));

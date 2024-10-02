@@ -7,7 +7,7 @@ import java.util.Optional;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.quarkiverse.argocd.v1alpha1.Application;
-import io.quarkiverse.argocd.v1alpha1.ApplicationList;
+import io.quarkiverse.argocd.v1alpha1.ArgoCDResourceList;
 import picocli.CommandLine.Command;
 
 @Command(name = "uninstall", sortOptions = false, mixinStandardHelpOptions = false, header = "Uninstall ArgoCD Application.", headerHeading = "%n", commandListHeading = "%nCommands:%n", synopsisHeading = "%nUsage: ", optionListHeading = "%nOptions:%n")
@@ -16,8 +16,8 @@ public class UninstallCommand extends GenerationBaseCommand {
     Optional<String> generationPath = Optional.of(".argocd");
 
     @Override
-    void process(ApplicationList applicationList) {
-        if (applicationList.getItems().isEmpty()) {
+    void process(ArgoCDResourceList<?> resourceList) {
+        if (resourceList.getItems().isEmpty()) {
             System.out.println("No ArgoCD Application detected.");
             return;
         }
@@ -26,7 +26,7 @@ public class UninstallCommand extends GenerationBaseCommand {
         List<ApplicationListItem> items = new ArrayList<>();
         KubernetesClient kubernetesClient = new KubernetesClientBuilder().build();
 
-        for (Application application : applicationList.getItems()) {
+        for (Application application : resourceList.getApplicationList().getItems()) {
             kubernetesClient.resources(Application.class)
                     .inNamespace(application.getMetadata().getNamespace())
                     .withName(application.getMetadata().getName())
