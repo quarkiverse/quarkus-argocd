@@ -8,7 +8,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.quarkiverse.argocd.cli.utils.Git;
 import io.quarkiverse.argocd.v1alpha1.Application;
-import io.quarkiverse.argocd.v1alpha1.ApplicationList;
+import io.quarkiverse.argocd.v1alpha1.ArgoCDResourceList;
 import io.quarkus.devtools.utils.Prompt;
 import picocli.CommandLine.Command;
 
@@ -18,11 +18,11 @@ public class InstallCommand extends GenerationBaseCommand {
     Optional<String> generationPath = Optional.of(".argocd");
 
     @Override
-    void process(ApplicationList applicationList) {
+    void process(ArgoCDResourceList<?> resourceList) {
         ApplicationListTable table = new ApplicationListTable();
         List<ApplicationListItem> items = new ArrayList<>();
 
-        for (Application application : applicationList.getItems()) {
+        for (Application application : resourceList.getApplicationList().getItems()) {
             String repoURL = application.getSpec().getSource().getRepoURL();
             if (!Git.checkIfRepoExists(repoURL) && !Prompt.yesOrNo(false,
                     "Remote repository: " + repoURL + " does not exist. Do you still want to proceed (y/N)?")) {

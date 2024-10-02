@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import io.quarkiverse.argocd.deployment.utils.Serialization;
 import io.quarkiverse.argocd.v1alpha1.Application;
-import io.quarkiverse.argocd.v1alpha1.ApplicationList;
+import io.quarkiverse.argocd.v1alpha1.ArgoCDResourceList;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
@@ -17,7 +17,7 @@ public class GenerateCommand extends GenerationBaseCommand {
     Optional<String> generationPath = Optional.of(".argocd");
 
     @Override
-    public void process(ApplicationList applicationList) {
+    public void process(ArgoCDResourceList<?> resourceList) {
         Path outputDir = generationPath.map(Paths::get).orElse(Paths.get(".argocd"));
         if (outputDir.toFile().exists() && !outputDir.toFile().isDirectory()) {
             System.err.println("Output directory is not a directory: " + outputDir);
@@ -29,7 +29,7 @@ public class GenerateCommand extends GenerationBaseCommand {
         }
 
         System.out.println("ArgoCD Applications generated:");
-        for (Application application : applicationList.getItems()) {
+        for (Application application : resourceList.getApplicationList().getItems()) {
             String content = Serialization.asYaml(application);
             Path p = outputDir.resolve(application.getMetadata().getName() + ".yaml");
             writeStringSafe(p, content);
