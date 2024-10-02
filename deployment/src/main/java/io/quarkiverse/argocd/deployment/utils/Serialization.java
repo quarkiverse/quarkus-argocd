@@ -32,6 +32,7 @@ import io.dekorate.utils.Streams;
 import io.dekorate.utils.Strings;
 import io.quarkiverse.argocd.v1alpha1.Application;
 import io.quarkiverse.argocd.v1alpha1.ApplicationList;
+import io.quarkiverse.argocd.v1alpha1.ArgoCDResourceList;
 
 public class Serialization {
 
@@ -61,9 +62,10 @@ public class Serialization {
 
     public static <T> String asJson(T object) {
         try {
-            if (object instanceof ApplicationList) {
-                ApplicationList list = (ApplicationList) object;
-                return list.getItems().stream()
+            if (object instanceof ArgoCDResourceList<?> list) {
+                return asYaml(list.getItems());
+            } else if (object instanceof List<?> list) {
+                return list.stream()
                         .map(Serialization::writeValueAsJsonSafe)
                         .collect(Collectors.joining(",", "[", "]"));
             }
@@ -75,13 +77,13 @@ public class Serialization {
 
     public static <T> String asYaml(T object) {
         try {
-            if (object instanceof ApplicationList) {
-                ApplicationList list = (ApplicationList) object;
+            if (object instanceof ArgoCDResourceList<?> list) {
                 if (list.getItems().size() == 1) {
                     return YAML_MAPPER.writeValueAsString(list.getItems().get(0)).replaceAll(TAG_PATTERN, BLANK);
                 }
-
-                return list.getItems().stream()
+                return asYaml(list.getItems());
+            } else if (object instanceof List<?> list) {
+                return list.stream()
                         .map(Serialization::writeValueAsYamlSafe)
                         .map(s -> s.replaceAll(TAG_PATTERN, BLANK))
                         .collect(Collectors.joining());

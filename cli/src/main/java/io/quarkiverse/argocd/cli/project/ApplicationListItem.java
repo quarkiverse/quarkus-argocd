@@ -1,16 +1,18 @@
-package io.quarkiverse.argocd.cli.application;
+package io.quarkiverse.argocd.cli.project;
 
 import io.quarkiverse.argocd.v1alpha1.Application;
 
 public class ApplicationListItem {
 
     private String name;
+    private String project;
     private String repo;
     private String syncStatus;
     private String healthStatus;
 
     public static ApplicationListItem from(Application application) {
         return new ApplicationListItem(application.getMetadata().getName(),
+                application.getSpec().getProject(),
                 application.getSpec().getSource().getRepoURL(),
                 application.getStatus() != null && application.getStatus().getSync() != null
                         ? application.getStatus().getSync().getStatus()
@@ -20,8 +22,9 @@ public class ApplicationListItem {
                         : "");
     }
 
-    public ApplicationListItem(String name, String repo, String syncStatus, String healthStatus) {
+    public ApplicationListItem(String name, String project, String repo, String syncStatus, String healthStatus) {
         this.name = name;
+        this.project = project;
         this.repo = repo;
         this.syncStatus = syncStatus;
         this.healthStatus = healthStatus;
@@ -29,6 +32,10 @@ public class ApplicationListItem {
 
     public String getName() {
         return name;
+    }
+
+    public String getProject() {
+        return project;
     }
 
     public String getRepo() {

@@ -1,4 +1,4 @@
-package io.quarkiverse.argocd.cli.application;
+package io.quarkiverse.argocd.cli.project;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,21 +19,49 @@ public class ApplicationListTable {
 
     private static final String NEWLINE = "\n";
 
+    private String indent = "";
+    private boolean showHeader = true;
     private List<ApplicationListItem> items;
 
     public ApplicationListTable(ApplicationList applicationList) {
-        this.items = applicationList.getItems().stream().map(ApplicationListItem::from).toList();
+        this(applicationList.getItems().stream().map(ApplicationListItem::from).toList());
     }
 
     public ApplicationListTable(Collection<ApplicationListItem> items) {
-        this.items = new ArrayList<>(items);
+        this(new ArrayList<>(items), "", true);
+    }
+
+    public ApplicationListTable(List<ApplicationListItem> items, String indent, boolean showHeader) {
+        this.items = items;
+        this.indent = indent;
+        this.showHeader = showHeader;
     }
 
     public ApplicationListTable() {
     }
 
+    private void setItems(List<ApplicationListItem> items) {
+        this.items = items;
+    }
+
+    private void setIndent(String indent) {
+        this.indent = indent;
+    }
+
+    private void setShowHeader(boolean showHeader) {
+        this.showHeader = showHeader;
+    }
+
     public String getContent() {
-        return getContent(items);
+        String format = getFormat(items);
+        StringBuilder sb = new StringBuilder();
+        if (showHeader) {
+            sb.append(indent);
+            sb.append(getHeader(format, items));
+            sb.append(NEWLINE);
+        }
+        sb.append(getBody(format, items, indent));
+        return sb.toString();
     }
 
     // Utils
@@ -45,25 +73,13 @@ public class ApplicationListTable {
         return String.format(format, getLabels());
     }
 
-    private static String getBody(String format, Collection<ApplicationListItem> items) {
+    private static String getBody(String format, Collection<ApplicationListItem> items, String indent) {
         StringBuilder sb = new StringBuilder();
         for (ApplicationListItem item : items) {
+            sb.append(indent);
             sb.append(String.format(format, item.getFields()));
             sb.append(NEWLINE);
         }
-        return sb.toString();
-    }
-
-    public static String getContent(Collection<ApplicationListItem> items) {
-        String format = getFormat(items);
-        return getContent(format, items);
-    }
-
-    public static String getContent(String format, Collection<ApplicationListItem> items) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getHeader(format, items));
-        sb.append(NEWLINE);
-        sb.append(getBody(format, items));
         return sb.toString();
     }
 
