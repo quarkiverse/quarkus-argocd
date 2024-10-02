@@ -1,4 +1,4 @@
-package io.quarkiverse.argocd.cli.application;
+package io.quarkiverse.argocd.cli.project;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,7 +27,7 @@ import io.quarkus.maven.dependency.ArtifactDependency;
 import picocli.CommandLine.ExitCode;
 import picocli.CommandLine.Option;
 
-public abstract class GenerationBaseCommand extends ApplicationBaseCommand implements Callable<Integer> {
+public abstract class GenerationBaseCommand extends ProjectBaseCommand implements Callable<Integer> {
 
     private static final ArtifactDependency QUARKUS_ARGOCD = new ArtifactDependency("io.quarkiverse.argocd", "quarkus-argocd",
             null, "jar", GenerationBaseCommand.getVersion());

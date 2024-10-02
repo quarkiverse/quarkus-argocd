@@ -13,6 +13,8 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.quarkiverse.argocd.deployment.utils.Serialization;
 import io.quarkiverse.argocd.spi.ArgoCDOutputDirBuildItem;
 import io.quarkiverse.argocd.spi.ArgoCDResourceListBuildItem;
+import io.quarkiverse.argocd.v1alpha1.AppProject;
+import io.quarkiverse.argocd.v1alpha1.AppProjectBuilder;
 import io.quarkiverse.argocd.v1alpha1.Application;
 import io.quarkiverse.argocd.v1alpha1.ApplicationBuilder;
 import io.quarkiverse.argocd.v1alpha1.ArgoCDResourceList;
@@ -70,6 +72,22 @@ class ArgoCDProcessor {
         Path helmOutputDir = customHelmOutputDir.map(CustomHelmOutputDirBuildItem::getOutputDir).orElse(Paths.get(".helm"));
 
         // @formatter:off
+        AppProject project = new AppProjectBuilder()
+          .withNewMetadata()
+            .withName(applicationInfo.getName())
+            .withNamespace(namespace)
+          .endMetadata()
+          .withNewSpec()
+            .addNewDestination()
+              .withNamespace(applicationNamespace)
+              .withServer(config.server)
+            .endDestination()
+          .withSourceRepos(scmInfo.getDefaultRemoteUrl())
+          .endSpec()
+          .build();
+        // @formatter:on
+
+        // @formatter:off
         Application deploy = new ApplicationBuilder()
                 .withNewMetadata()
                   .withName(applicationInfo.getName() + "-deploy")
@@ -108,8 +126,7 @@ class ArgoCDProcessor {
         // @formatter:on
 
         ArgoCDResourceList<HasMetadata> resourceList = new ArgoCDResourceList<>();
-        resourceList.setItems(List.of(deploy));
-
+        resourceList.setItems(List.of(project, deploy));
         resourceListProducer.produce(new ArgoCDResourceListBuildItem(resourceList));
     }
 
@@ -124,7 +141,7 @@ class ArgoCDProcessor {
             Path argocdRoot = dir.getOutputDir();
             Path applicationDeployPath = argocdRoot.resolve(applicationInfo.getName() + "-deploy.yaml");
 
-            var str = Serialization.asYaml(resourceList);
+            var str = Serialization.asYaml(resourceList.getResourceList().getItems());
             generatedResourceProducer.produce(
                     new GeneratedFileSystemResourceBuildItem(applicationDeployPath.toAbsolutePath().toString(),
                             str.getBytes(StandardCharsets.UTF_8)));
