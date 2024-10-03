@@ -61,10 +61,10 @@ quarkus plug add io.quarkiverse.argocd:quarkus-argocd-cli:999-SNAPSHOT
 
 #### Regenerating the files:
 
-To re-triggger the file generation:
+To re-trigger the file generation:
 
 ```shell
-quarkus argocd application generate
+quarkus argocd project generate
 ```
 
 #### Installing the application
@@ -72,17 +72,17 @@ quarkus argocd application generate
 To install generated `Application` CR to the currently connected Kubernetes cluster:
 
 ```shell
-quarkus argocd application install
+quarkus argocd project install
 ```
-**Note**: In case of uncommited or unpushed changes the command will prompt users to decide if they want to proceed with the installation.
+**Note**: In case of un-committed or un-pushed changes the command will prompt users to decide if they want to proceed with the installation.
 
 The `currently connected Kubernetes cluster` is the one that is configured in the `~/.kube/config` file.
-It can be overriden by setting in `applcation.properties` a different API server url and token. See the `quarkus-kubernetes-client` extension for more details.
+It can be overridden by setting in `applcation.properties` a different API server URL and token. See the `quarkus-kubernetes-client` extension for more details.
 
 To uninstall:
 
 ```shell
-quarkus argocd application uninstall
+quarkus argocd project uninstall
 ```
 
 #### Listing installed applications
@@ -90,5 +90,5 @@ quarkus argocd application uninstall
 To list all Applications installed
 
 ```shell
-quarkus argocd application list
+quarkus argocd project list
 ```

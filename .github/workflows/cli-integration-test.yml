@@ -95,23 +95,23 @@ jobs:
           ls -al
           git log
           
-          echo "## Generate the Argo CD application"
-          quarkus argocd application generate
+          echo "## Generate the Argo CD project"
+          quarkus argocd project generate
           
           echo "## Check if the file has been generated ..."
-          if [ -f ".argocd/code-with-quarkus-deploy.yaml" ]; then
-            echo "Argo CD file has been generated"
+          if [ -f ".argocd/project-code-with-quarkus.yaml" ]; then
+            echo "Argo CD file(s) has been generated"
           else
-            echo "Argo CD file has not been generated"
+            echo "Argo CD file(s) has not been generated"
             ls -la .argocd
             exit 1
           fi 
           
-          if yq eval '.applicationList.items[].spec.source.repoURL' ".argocd/code-with-quarkus-deploy.yaml" > /dev/null; then
+          if yq eval '.applicationList.items[].spec.source.repoURL' ".argocd/application-code-with-quarkus-deploy.yaml" > /dev/null; then
             echo "repoURL field exists within the generated Argo CD generated file !"
           else
             echo "## ArgoCD file has not been generated properly !"
-            cat ".argocd/code-with-quarkus-deploy.yaml"
+            cat ".argocd/applicaiotn-code-with-quarkus-deploy.yaml"
             exit 1
           fi
           popd
