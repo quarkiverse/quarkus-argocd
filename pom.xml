@@ -38,7 +38,7 @@
         <quarkus.version>3.14.4</quarkus.version>
         <sundrio.version>0.103.1</sundrio.version>
         <lombok.version>1.18.26</lombok.version>
-        <kubernetes-client.version>6.13.1</kubernetes-client.version>
+        <kubernetes-client.version>6.13.4</kubernetes-client.version>
         <quarkus-jgit.version>3.1.2</quarkus-jgit.version>
         <quarkus-helm.version>1.2.4</quarkus-helm.version>
         <surefire-plugin.version>3.2.5</surefire-plugin.version>
