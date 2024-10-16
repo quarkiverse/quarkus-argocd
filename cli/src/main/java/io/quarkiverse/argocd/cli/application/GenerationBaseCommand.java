@@ -32,10 +32,12 @@ public abstract class GenerationBaseCommand extends ApplicationBaseCommand imple
     private static final ArtifactDependency QUARKUS_ARGOCD = new ArtifactDependency("io.quarkiverse.argocd", "quarkus-argocd",
             null, "jar", GenerationBaseCommand.getVersion());
 
-    @Option(names = { "-n", "--namespace" }, description = "The target namespace (where the Custom Resources will be installed)")
+    @Option(names = { "-n",
+            "--namespace" }, description = "The target namespace (where the Custom Resources will be installed)")
     Optional<String> namespace = Optional.empty();
 
-    @Option(names = { "--app-namespace" }, description = "The target application namespace (where the Applications will be installed)")
+    @Option(names = {
+            "--app-namespace" }, description = "The target application namespace (where the Applications will be installed)")
     Optional<String> applicationNamespace = Optional.empty();
 
     @Option(names = { "-p", "--project" }, description = "The target project")
