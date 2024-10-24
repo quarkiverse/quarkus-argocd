@@ -5,4 +5,3 @@ package io.quarkiverse.argocd.templates;
  **/
 public class Templates {
 }
-
