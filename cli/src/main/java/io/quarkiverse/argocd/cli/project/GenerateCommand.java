@@ -39,7 +39,7 @@ public class GenerateCommand extends GenerationBaseCommand {
             List<ApplicationListItem> applicationItems = new ArrayList<>();
             String projectName = project.getMetadata().getName();
             String projectContent = Serialization.asYaml(project);
-            Path projectPath = outputDir.resolve("project-" + project.getMetadata().getName() + ".yaml");
+            Path projectPath = outputDir.resolve("appproject-" + project.getMetadata().getName() + ".yaml");
             writeStringSafe(projectPath, projectContent);
 
             List<Application> projectApplications = resourceList.getApplicationList().getItems().stream()

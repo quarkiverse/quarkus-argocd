@@ -49,8 +49,10 @@ class ArgoCDProcessor {
     @BuildStep
     public void customOutputDir(OutputTargetBuildItem outputTarget,
             BuildProducer<ArgoCDOutputDirBuildItem.Effective> outputDirProducer) {
-        getScmRoot(outputTarget)
-                .ifPresent(p -> outputDirProducer.produce(new ArgoCDOutputDirBuildItem.Effective(p.resolve(".argocd"))));
+        getScmRoot(outputTarget).ifPresentOrElse(
+                p -> outputDirProducer.produce(new ArgoCDOutputDirBuildItem.Effective(p.resolve(".argocd"))),
+                () -> outputDirProducer
+                        .produce(new ArgoCDOutputDirBuildItem.Effective(outputTarget.getOutputDirectory().resolve("argocd"))));
     }
 
     @BuildStep
@@ -137,9 +139,22 @@ class ArgoCDProcessor {
             Optional<ArgoCDOutputDirBuildItem.Effective> outputDir,
             BuildProducer<GeneratedFileSystemResourceBuildItem> generatedResourceProducer) {
 
+        if (resourceList == null || resourceList.getResourceList() == null) {
+            return;
+        }
+
         outputDir.ifPresent(dir -> {
             Path argocdRoot = dir.getOutputDir();
             Path applicationDeployPath = argocdRoot.resolve(applicationInfo.getName() + "-deploy.yaml");
+
+            for (HasMetadata item : resourceList.getResourceList().getItems()) {
+                String kind = item.getKind().toLowerCase();
+                String name = item.getMetadata().getName();
+                Path path = argocdRoot.resolve(kind + "-" + name + ".yaml");
+                var str = Serialization.asYaml(item);
+                generatedResourceProducer.produce(new GeneratedFileSystemResourceBuildItem(path.toAbsolutePath().toString(),
+                        str.getBytes(StandardCharsets.UTF_8)));
+            }
 
             var str = Serialization.asYaml(resourceList.getResourceList().getItems());
             generatedResourceProducer.produce(

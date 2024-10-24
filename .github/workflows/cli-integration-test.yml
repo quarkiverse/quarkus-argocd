@@ -99,7 +99,7 @@ jobs:
           quarkus argocd project generate
           
           echo "## Check if the file has been generated ..."
-          if [ -f ".argocd/project-code-with-quarkus.yaml" ]; then
+          if [ -f ".argocd/appproject-code-with-quarkus.yaml" ]; then
             echo "Argo CD file(s) has been generated"
           else
             echo "Argo CD file(s) has not been generated"
