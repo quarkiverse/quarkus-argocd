@@ -36,7 +36,7 @@ To add the extension to the project, manually edit the `pom.xml` or `build.gradl
 <dependency>
     <groupId>io.quarkiverse.argocd</groupId>
     <artifactId>quarkus-argocd</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.0.3</version>
 </dependency>
 ```
 
@@ -44,7 +44,7 @@ To add the extension to the project, manually edit the `pom.xml` or `build.gradl
 
 ```groovy
 dependencies {
-    implementation 'io.quarkiverse.argocd:quarkus-argocd:999-SNAPSHOT'
+    implementation 'io.quarkiverse.argocd:quarkus-argocd:0.0.3'
 }
 ```
 
@@ -56,7 +56,7 @@ The project provides a companion CLI that can be used to install / uninstall and
 The CLI can be added with the following command:
 
 ```shell
-quarkus plug add io.quarkiverse.argocd:quarkus-argocd-cli:999-SNAPSHOT
+quarkus plug add io.quarkiverse.argocd:quarkus-argocd-cli:0.0.3
 ```
 
 #### Regenerating the files:
