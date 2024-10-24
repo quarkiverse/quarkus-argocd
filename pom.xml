@@ -9,7 +9,7 @@
     </parent>
     <groupId>io.quarkiverse.argocd</groupId>
     <artifactId>quarkus-argocd-parent</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.0.3</version>
     <packaging>pom</packaging>
     <name>Quarkus ArgoCD - Parent</name>
 
@@ -27,7 +27,7 @@
         <connection>scm:git:git@github.com:quarkiverse/quarkus-argocd.git</connection>
         <developerConnection>scm:git:git@github.com:quarkiverse/quarkus-argocd.git</developerConnection>
         <url>https://github.com/quarkiverse/quarkus-argocd</url>
-      <tag>HEAD</tag>
+      <tag>0.0.3</tag>
   </scm>
 
     <properties>
