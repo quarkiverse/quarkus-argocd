@@ -11,7 +11,7 @@ import picocli.CommandLine.Spec;
 
 @TopCommand
 @Command(name = "argocd", sortOptions = false, mixinStandardHelpOptions = false, header = "ArgoCD CLI", subcommands = {
-        ApplicationCommand.class })
+        ProjectCommand.class })
 public class ArgoCommand implements Callable<Integer> {
 
     @Spec

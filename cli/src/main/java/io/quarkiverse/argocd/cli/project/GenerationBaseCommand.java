@@ -1,4 +1,4 @@
-package io.quarkiverse.argocd.cli.application;
+package io.quarkiverse.argocd.cli.project;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,8 +15,8 @@ import java.util.function.Consumer;
 import io.dekorate.utils.Strings;
 import io.quarkiverse.argocd.cli.handlers.GetArgoCDApplicationHandler;
 import io.quarkiverse.argocd.cli.utils.Git;
-import io.quarkiverse.argocd.spi.ArgoCDApplicationListBuildItem;
-import io.quarkiverse.argocd.v1alpha1.ApplicationList;
+import io.quarkiverse.argocd.spi.ArgoCDResourceListBuildItem;
+import io.quarkiverse.argocd.v1alpha1.ArgoCDResourceList;
 import io.quarkus.bootstrap.BootstrapException;
 import io.quarkus.bootstrap.app.AugmentAction;
 import io.quarkus.bootstrap.app.CuratedApplication;
@@ -27,7 +27,7 @@ import io.quarkus.maven.dependency.ArtifactDependency;
 import picocli.CommandLine.ExitCode;
 import picocli.CommandLine.Option;
 
-public abstract class GenerationBaseCommand extends ApplicationBaseCommand implements Callable<Integer> {
+public abstract class GenerationBaseCommand extends ProjectBaseCommand implements Callable<Integer> {
 
     private static final ArtifactDependency QUARKUS_ARGOCD = new ArtifactDependency("io.quarkiverse.argocd", "quarkus-argocd",
             null, "jar", GenerationBaseCommand.getVersion());
@@ -88,21 +88,21 @@ public abstract class GenerationBaseCommand extends ApplicationBaseCommand imple
                 .build();
 
         List<String> resultBuildItemFQCNs = new ArrayList<>();
-        resultBuildItemFQCNs.add(ArgoCDApplicationListBuildItem.class.getName());
+        resultBuildItemFQCNs.add(ArgoCDResourceListBuildItem.class.getName());
 
         // Checking
         try (CuratedApplication curatedApplication = quarkusBootstrap.bootstrap()) {
             AugmentAction action = curatedApplication.createAugmentor();
 
-            action.performCustomBuild(GetArgoCDApplicationHandler.class.getName(), new Consumer<ApplicationList>() {
+            action.performCustomBuild(GetArgoCDApplicationHandler.class.getName(), new Consumer<ArgoCDResourceList<?>>() {
                 @Override
-                public void accept(ApplicationList applicationList) {
-                    if (applicationList.getItems().isEmpty()) {
+                public void accept(ArgoCDResourceList<?> resourceList) {
+                    if (resourceList.getItems().isEmpty()) {
                         System.out.println("Can't generate ArgoCD custom resources.");
                         return;
                     }
 
-                    process(applicationList);
+                    process(resourceList);
 
                 }
             }, resultBuildItemFQCNs.toArray(new String[resultBuildItemFQCNs.size()]));
@@ -113,7 +113,7 @@ public abstract class GenerationBaseCommand extends ApplicationBaseCommand imple
         return ExitCode.OK;
     }
 
-    abstract void process(ApplicationList applicationList);
+    abstract void process(ArgoCDResourceList<?> resourceList);
 
     protected void writeStringSafe(Path p, String content) {
         try {

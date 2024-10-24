@@ -1,4 +1,4 @@
-package io.quarkiverse.argocd.cli.application;
+package io.quarkiverse.argocd.cli.project;
 
 import java.util.concurrent.Callable;
 
@@ -9,7 +9,7 @@ import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
 
-public abstract class ApplicationBaseCommand implements Callable<Integer> {
+public abstract class ProjectBaseCommand implements Callable<Integer> {
 
     @Inject
     KubernetesClient kubernetesClient;

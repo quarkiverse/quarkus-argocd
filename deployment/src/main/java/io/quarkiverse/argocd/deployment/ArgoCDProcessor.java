@@ -9,13 +9,15 @@ import java.util.Optional;
 import org.jboss.logging.Logger;
 
 import io.dekorate.utils.Git;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.quarkiverse.argocd.deployment.utils.Serialization;
-import io.quarkiverse.argocd.spi.ArgoCDApplicationListBuildItem;
 import io.quarkiverse.argocd.spi.ArgoCDOutputDirBuildItem;
+import io.quarkiverse.argocd.spi.ArgoCDResourceListBuildItem;
+import io.quarkiverse.argocd.v1alpha1.AppProject;
+import io.quarkiverse.argocd.v1alpha1.AppProjectBuilder;
 import io.quarkiverse.argocd.v1alpha1.Application;
 import io.quarkiverse.argocd.v1alpha1.ApplicationBuilder;
-import io.quarkiverse.argocd.v1alpha1.ApplicationList;
-import io.quarkiverse.argocd.v1alpha1.ApplicationListBuilder;
+import io.quarkiverse.argocd.v1alpha1.ArgoCDResourceList;
 import io.quarkiverse.helm.spi.CustomHelmOutputDirBuildItem;
 import io.quarkus.deployment.IsTest;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -47,8 +49,10 @@ class ArgoCDProcessor {
     @BuildStep
     public void customOutputDir(OutputTargetBuildItem outputTarget,
             BuildProducer<ArgoCDOutputDirBuildItem.Effective> outputDirProducer) {
-        getScmRoot(outputTarget)
-                .ifPresent(p -> outputDirProducer.produce(new ArgoCDOutputDirBuildItem.Effective(p.resolve(".argocd"))));
+        getScmRoot(outputTarget).ifPresentOrElse(
+                p -> outputDirProducer.produce(new ArgoCDOutputDirBuildItem.Effective(p.resolve(".argocd"))),
+                () -> outputDirProducer
+                        .produce(new ArgoCDOutputDirBuildItem.Effective(outputTarget.getOutputDirectory().resolve("argocd"))));
     }
 
     @BuildStep
@@ -57,7 +61,7 @@ class ArgoCDProcessor {
             List<FeatureBuildItem> features,
             ScmInfoBuildItem scmInfo,
             Optional<CustomHelmOutputDirBuildItem> customHelmOutputDir,
-            BuildProducer<ArgoCDApplicationListBuildItem> applicationListProducer) {
+            BuildProducer<ArgoCDResourceListBuildItem> resourceListProducer) {
 
         if (scmInfo == null) {
             log.warn("No SCM information found. Skipping argocd deployment generation.");
@@ -70,13 +74,29 @@ class ArgoCDProcessor {
         Path helmOutputDir = customHelmOutputDir.map(CustomHelmOutputDirBuildItem::getOutputDir).orElse(Paths.get(".helm"));
 
         // @formatter:off
+        AppProject project = new AppProjectBuilder()
+          .withNewMetadata()
+            .withName(applicationInfo.getName())
+            .withNamespace(namespace)
+          .endMetadata()
+          .withNewSpec()
+            .addNewDestination()
+              .withNamespace(applicationNamespace)
+              .withServer(config.server)
+            .endDestination()
+          .withSourceRepos(scmInfo.getDefaultRemoteUrl())
+          .endSpec()
+          .build();
+        // @formatter:on
+
+        // @formatter:off
         Application deploy = new ApplicationBuilder()
                 .withNewMetadata()
                   .withName(applicationInfo.getName() + "-deploy")
                   .withNamespace(namespace)
                 .endMetadata()
                 .withNewSpec()
-                  .withProject(config.project.orElse("default"))
+                  .withProject(config.project.orElse(applicationInfo.getName()))
                   .withNewDestination()
                     .withServer(config.server)
                     .withNamespace(applicationNamespace)
@@ -106,25 +126,37 @@ class ArgoCDProcessor {
                 .endSpec()
                 .build();
         // @formatter:on
-        ApplicationList applicationList = new ApplicationListBuilder()
-                .withItems(List.of(deploy))
-                .build();
 
-        applicationListProducer.produce(new ArgoCDApplicationListBuildItem(applicationList));
+        ArgoCDResourceList<HasMetadata> resourceList = new ArgoCDResourceList<>();
+        resourceList.setItems(List.of(project, deploy));
+        resourceListProducer.produce(new ArgoCDResourceListBuildItem(resourceList));
     }
 
     @BuildStep(onlyIfNot = IsTest.class)
-    public void generateApplicationFileSystemResources(ArgoCDApplicationListBuildItem applicationList,
+    public void generateApplicationFileSystemResources(ArgoCDResourceListBuildItem resourceList,
             ApplicationInfoBuildItem applicationInfo,
             OutputTargetBuildItem outputTarget,
             Optional<ArgoCDOutputDirBuildItem.Effective> outputDir,
             BuildProducer<GeneratedFileSystemResourceBuildItem> generatedResourceProducer) {
 
+        if (resourceList == null || resourceList.getResourceList() == null) {
+            return;
+        }
+
         outputDir.ifPresent(dir -> {
             Path argocdRoot = dir.getOutputDir();
             Path applicationDeployPath = argocdRoot.resolve(applicationInfo.getName() + "-deploy.yaml");
 
-            var str = Serialization.asYaml(applicationList);
+            for (HasMetadata item : resourceList.getResourceList().getItems()) {
+                String kind = item.getKind().toLowerCase();
+                String name = item.getMetadata().getName();
+                Path path = argocdRoot.resolve(kind + "-" + name + ".yaml");
+                var str = Serialization.asYaml(item);
+                generatedResourceProducer.produce(new GeneratedFileSystemResourceBuildItem(path.toAbsolutePath().toString(),
+                        str.getBytes(StandardCharsets.UTF_8)));
+            }
+
+            var str = Serialization.asYaml(resourceList.getResourceList().getItems());
             generatedResourceProducer.produce(
                     new GeneratedFileSystemResourceBuildItem(applicationDeployPath.toAbsolutePath().toString(),
                             str.getBytes(StandardCharsets.UTF_8)));
