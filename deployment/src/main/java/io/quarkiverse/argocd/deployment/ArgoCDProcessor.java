@@ -134,7 +134,6 @@ class ArgoCDProcessor {
 
     @BuildStep(onlyIfNot = IsTest.class)
     public void generateApplicationFileSystemResources(ArgoCDResourceListBuildItem resourceList,
-            ApplicationInfoBuildItem applicationInfo,
             OutputTargetBuildItem outputTarget,
             Optional<ArgoCDOutputDirBuildItem.Effective> outputDir,
             BuildProducer<GeneratedFileSystemResourceBuildItem> generatedResourceProducer) {
@@ -145,7 +144,6 @@ class ArgoCDProcessor {
 
         outputDir.ifPresent(dir -> {
             Path argocdRoot = dir.getOutputDir();
-            Path applicationDeployPath = argocdRoot.resolve(applicationInfo.getName() + "-deploy.yaml");
 
             for (HasMetadata item : resourceList.getResourceList().getItems()) {
                 String kind = item.getKind().toLowerCase();
@@ -155,11 +153,6 @@ class ArgoCDProcessor {
                 generatedResourceProducer.produce(new GeneratedFileSystemResourceBuildItem(path.toAbsolutePath().toString(),
                         str.getBytes(StandardCharsets.UTF_8)));
             }
-
-            var str = Serialization.asYaml(resourceList.getResourceList().getItems());
-            generatedResourceProducer.produce(
-                    new GeneratedFileSystemResourceBuildItem(applicationDeployPath.toAbsolutePath().toString(),
-                            str.getBytes(StandardCharsets.UTF_8)));
         });
     }
 
