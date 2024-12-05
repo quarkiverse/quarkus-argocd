@@ -92,7 +92,7 @@ class ArgoCDProcessor {
         // @formatter:off
         Application deploy = new ApplicationBuilder()
                 .withNewMetadata()
-                  .withName(applicationInfo.getName() + "-deploy")
+                  .withName(applicationInfo.getName())
                   .withNamespace(namespace)
                 .endMetadata()
                 .withNewSpec()
