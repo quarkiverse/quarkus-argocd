@@ -107,11 +107,11 @@ jobs:
             exit 1
           fi 
           
-          if yq eval '.applicationList.items[].spec.source.repoURL' ".argocd/application-code-with-quarkus-deploy.yaml" > /dev/null; then
+          if yq eval '.applicationList.items[].spec.source.repoURL' ".argocd/application-code-with-quarkus.yaml" > /dev/null; then
             echo "repoURL field exists within the generated Argo CD generated file !"
           else
             echo "## ArgoCD file has not been generated properly !"
-            cat ".argocd/applicaiotn-code-with-quarkus-deploy.yaml"
+            cat ".argocd/application-code-with-quarkus.yaml"
             exit 1
           fi
           popd
