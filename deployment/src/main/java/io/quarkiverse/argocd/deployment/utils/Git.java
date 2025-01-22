@@ -25,16 +25,40 @@ public class Git {
         }
     }
 
+    /**
+     * Generate an HTTPS url of an SCM according to: https://git-scm.com/docs/git-clone#_git_urls
+     * <p>
+     * The method handles different protocols of an SCM repository:
+     * HTTP : http[s]://<GIT_SERVER>[:<PORT>]/path/project[.git]
+     * HTTP with Basic Auth : http[s]://<username>:<password>@<GIT_SERVER>[:<PORT>]/path/project[.git]
+     * Git : git@<GIT_SERVER>:<REPOSITORY_ORG>/path/project[.git]
+     *
+     * @param remoteUrl the String of the url of the scm.
+     * @return The String of the url converted.
+     */
     public static String sanitizeRemoteUrl(String remoteUrl) {
-        final int atSign = remoteUrl.indexOf('@');
-        if (atSign > 0) {
-            remoteUrl = remoteUrl.substring(atSign + 1);
-            remoteUrl = "https://" + remoteUrl;
+        if (remoteUrl == null || remoteUrl.isEmpty()) {
+            throw new IllegalArgumentException("The remote URL cannot be null or empty.");
         }
-        if (!remoteUrl.endsWith(".git")) {
-            remoteUrl += ".git";
+
+        String normalizedUrl = null;
+
+        if (remoteUrl.startsWith("http://") || remoteUrl.startsWith("https://")) {
+            // Handle HTTP(S) and HTTP(S) with Basic Auth
+            normalizedUrl = remoteUrl.replaceAll("https?://[\\w%:]*@", "https://");
+        } else if (remoteUrl.startsWith("git@")) {
+            // Handle Git URL (SSH)
+            normalizedUrl = remoteUrl.replaceFirst("git@([\\w.-]+):", "https://$1/");
+        } else {
+            throw new IllegalArgumentException("Unsupported URL format: " + remoteUrl);
         }
-        return remoteUrl;
+
+        // Ensure the URL ends with .git
+        if (!normalizedUrl.endsWith(".git")) {
+            normalizedUrl += ".git";
+        }
+
+        return normalizedUrl;
     }
 
     public static Optional<String> getBranch(Path path) {
@@ -74,7 +98,7 @@ public class Git {
      *
      * @param remote The target remote.
      * @param state An atomic boolean which holds the predicate state.
-     * @reuturn The predicate.
+     * @return The predicate.
      */
     public static Predicate<String> inRemote(String remote, AtomicBoolean state) {
         return l -> {

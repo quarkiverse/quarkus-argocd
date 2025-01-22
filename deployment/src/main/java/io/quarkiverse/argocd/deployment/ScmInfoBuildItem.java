@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 
-import io.dekorate.utils.Git;
+import io.quarkiverse.argocd.deployment.utils.Git;
 import io.quarkus.builder.item.SimpleBuildItem;
 
 public final class ScmInfoBuildItem extends SimpleBuildItem {
@@ -55,7 +55,7 @@ public final class ScmInfoBuildItem extends SimpleBuildItem {
             return scmInfo;
         }
         try {
-            Map<String, String> remotes = Git.getRemotes(path);
+            Map<String, String> remotes = io.dekorate.utils.Git.getRemotes(path);
             if (remotes.isEmpty()) {
                 return Optional.empty();
             }
