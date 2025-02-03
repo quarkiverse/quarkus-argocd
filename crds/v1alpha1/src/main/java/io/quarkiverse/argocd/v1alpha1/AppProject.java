@@ -20,6 +20,12 @@ public class AppProject extends
         io.fabric8.kubernetes.client.CustomResource<io.quarkiverse.argocd.v1alpha1.AppProjectSpec, io.quarkiverse.argocd.v1alpha1.AppProjectStatus>
         implements io.fabric8.kubernetes.api.model.Namespaced, io.fabric8.kubernetes.api.builder.Editable<AppProjectBuilder> {
 
+    @java.lang.Override()
+    @io.fabric8.generator.annotation.Required()
+    public io.quarkiverse.argocd.v1alpha1.AppProjectSpec getSpec() {
+        return super.getSpec();
+    }
+
     @java.lang.Override
     public AppProjectBuilder edit() {
         return new AppProjectBuilder(this);
