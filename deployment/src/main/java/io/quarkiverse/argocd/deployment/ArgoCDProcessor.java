@@ -76,9 +76,9 @@ class ArgoCDProcessor {
         Optional<KubernetesDeploymentTargetBuildItem> deploymentTarget = deploymentTargets.stream().sorted().findFirst();
         boolean targetsOpenShift = deploymentTarget.filter(t -> t.getName().equals("openshift")).isPresent();
 
-        String namespace = config.namespace.or(() -> config.project)
+        String namespace = config.namespace().or(config::project)
                 .orElse(targetsOpenShift ? ARGOCD_NAMESPACE_OPERNSHIFT : ARGOCD_NAMESPACE_KUBE);
-        String applicationNamespace = config.applicationNamespace.or(() -> config.namespace).orElse(null);
+        String applicationNamespace = config.applicationNamespace().or(config::namespace).orElse(null);
         Path helmOutputDir = customHelmOutputDir.map(CustomHelmOutputDirBuildItem::getOutputDir).orElse(Paths.get(".helm"));
 
         // @formatter:off
@@ -90,7 +90,7 @@ class ArgoCDProcessor {
           .withNewSpec()
             .addNewDestination()
               .withNamespace(applicationNamespace)
-              .withServer(config.server)
+              .withServer(config.server())
             .endDestination()
           .withSourceRepos(scmInfo.getDefaultRemoteUrl())
           .endSpec()
@@ -104,15 +104,15 @@ class ArgoCDProcessor {
                   .withNamespace(namespace)
                 .endMetadata()
                 .withNewSpec()
-                  .withProject(config.project.orElse(applicationInfo.getName()))
+                  .withProject(config.project().orElse(applicationInfo.getName()))
                   .withNewDestination()
-                    .withServer(config.server)
+                    .withServer(config.server())
                     .withNamespace(applicationNamespace)
                   .endDestination()
                   .withNewSource()
                     .withPath(helmOutputDir.resolve("kubernetes").resolve(applicationInfo.getName()).toString()) //TODO: Get target deployment target.
                     .withRepoURL(scmInfo.getDefaultRemoteUrl())
-                    .withTargetRevision(config.targetRevision)
+                    .withTargetRevision(config.targetRevision())
                     .withNewHelm()
                       .withValueFiles("values.yaml")
                      .endApplicationspecHelm()
