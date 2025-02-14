@@ -2,42 +2,41 @@ package io.quarkiverse.argocd.deployment;
 
 import java.util.Optional;
 
-import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigRoot;
+import io.smallrye.config.ConfigMapping;
+import io.smallrye.config.WithDefault;
 
-@ConfigRoot(name = "argocd")
-public class ArgoCDConfiguration {
+@ConfigRoot
+@ConfigMapping(prefix = "quarkus.argocd")
+public interface ArgoCDConfiguration {
 
     /**
      * The Kubernetes API Server URL.
      */
-    @ConfigItem(defaultValue = "https://kubernetes.default.svc")
-    String server;
+    @WithDefault("https://kubernetes.default.svc")
+    String server();
 
     /**
      * The ArgoCDD project.
      */
-    @ConfigItem
-    Optional<String> project;
+    Optional<String> project();
 
     /**
      * The target namespace.
      */
-    @ConfigItem
-    Optional<String> namespace;
+    Optional<String> namespace();
 
     /**
      * The target revision.
      * Defaults to HEAD.
      */
-    @ConfigItem(defaultValue = "HEAD")
-    String targetRevision;
+    @WithDefault("HEAD")
+    String targetRevision();
 
     /**
      *
      * The namespace that the actual application deployment will be created in.
      */
-    @ConfigItem
-    Optional<String> applicationNamespace;
+    Optional<String> applicationNamespace();
 
 }
