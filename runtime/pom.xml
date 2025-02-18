@@ -16,6 +16,10 @@
             <artifactId>quarkus-arc</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-kubernetes-client</artifactId>
+        </dependency>
+        <dependency>
           <groupId>io.quarkus</groupId>
           <artifactId>quarkus-jackson</artifactId>
         </dependency>
@@ -40,6 +44,9 @@
                         </goals>
                         <configuration>
                             <deployment>${project.groupId}:${project.artifactId}-deployment:${project.version}</deployment>
+                            <!--<capabilities>
+                                <provides>io.quarkiverse.argocd.runtime</provides>
+                            </capabilities>-->
                         </configuration>
                     </execution>
                 </executions>

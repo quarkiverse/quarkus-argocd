@@ -1,4 +1,4 @@
-package io.quarkiverse.quarkus.argocd.it;
+package io.quarkiverse.argocd.it;
 
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 

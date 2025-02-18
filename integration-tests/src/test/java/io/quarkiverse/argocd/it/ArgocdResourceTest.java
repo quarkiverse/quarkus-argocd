@@ -1,4 +1,4 @@
-package io.quarkiverse.quarkus.argocd.it;
+package io.quarkiverse.argocd.it;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
