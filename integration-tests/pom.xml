@@ -9,7 +9,7 @@
     </parent>
     <artifactId>quarkus-argocd-integration-tests</artifactId>
     <name>Quarkus ArgoCD - Integration Tests</name>
-
+    <description>Quarkus ArgoCD - Integration Tests</description>
     <properties>
         <skipITs>true</skipITs>
     </properties>
@@ -25,6 +25,14 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5</artifactId>
             <scope>test</scope>
@@ -32,6 +40,17 @@
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-model-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkiverse.argocd</groupId>
+            <artifactId>quarkus-argocd-model-v1alpha1</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

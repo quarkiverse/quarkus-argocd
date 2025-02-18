@@ -28,14 +28,14 @@ import io.quarkus.deployment.builditem.GeneratedFileSystemResourceBuildItem;
 import io.quarkus.deployment.pkg.builditem.OutputTargetBuildItem;
 import io.quarkus.kubernetes.spi.KubernetesDeploymentTargetBuildItem;
 
-class ArgoCDProcessor {
+public class ArgoCDProcessor {
 
-    private static final String FEATURE = "argocd";
+    public static final String FEATURE = "argocd";
     private static final String DOT_GIT = ".git";
     private static final Logger log = Logger.getLogger(ArgoCDProcessor.class);
 
     private static final String ARGOCD_NAMESPACE_KUBE = "argocd";
-    private static final String ARGOCD_NAMESPACE_OPERNSHIFT = "openshift-gitops";
+    private static final String ARGOCD_NAMESPACE_OPENSHIFT = "openshift-gitops";
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -77,7 +77,7 @@ class ArgoCDProcessor {
         boolean targetsOpenShift = deploymentTarget.filter(t -> t.getName().equals("openshift")).isPresent();
 
         String namespace = config.namespace().or(config::project)
-                .orElse(targetsOpenShift ? ARGOCD_NAMESPACE_OPERNSHIFT : ARGOCD_NAMESPACE_KUBE);
+                .orElse(targetsOpenShift ? ARGOCD_NAMESPACE_OPENSHIFT : ARGOCD_NAMESPACE_KUBE);
         String applicationNamespace = config.applicationNamespace().or(config::namespace).orElse(null);
         Path helmOutputDir = customHelmOutputDir.map(CustomHelmOutputDirBuildItem::getOutputDir).orElse(Paths.get(".helm"));
 
