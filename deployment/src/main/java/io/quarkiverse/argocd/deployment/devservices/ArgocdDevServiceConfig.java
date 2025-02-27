@@ -1,0 +1,70 @@
+package io.quarkiverse.argocd.deployment.devservices;
+
+import io.quarkus.runtime.annotations.ConfigPhase;
+import io.quarkus.runtime.annotations.ConfigRoot;
+import io.smallrye.config.ConfigMapping;
+import io.smallrye.config.WithDefault;
+
+@ConfigMapping(prefix = "quarkus.argocd.devservices")
+@ConfigRoot(phase = ConfigPhase.BUILD_TIME)
+public interface ArgocdDevServiceConfig {
+
+    /**
+     * Enable the ArgoCD DevService.
+     */
+    @WithDefault("true")
+    boolean enabled();
+
+    /**
+     * Enable the debugging level.
+     */
+    @WithDefault("false")
+    boolean debugEnabled();
+
+    /**
+     * If logs should be shown from the Argocd container.
+     */
+    @WithDefault("false")
+    boolean showLogs();
+
+    /**
+     * The version of Argocd to be installed from the GitHub repository
+     * It can be: "latest" or a tagged release expressed as such: "v2.13.2"
+     */
+    @WithDefault("v2.13.2")
+    String version();
+
+    /**
+     * The Argocd controllers namespace where: Application, ApplicationSet, etc. are deployed and running
+     * The default namespace is: argocd
+     */
+    @WithDefault("argocd")
+    String controllerNamespace();
+
+    /**
+     * Time to wait till a resource is ready: pod, etc
+     * The default value is: 180 seconds
+     */
+    @WithDefault("180")
+    long timeOut();
+
+    /**
+     * The cluster type to be used: kind or k3
+     * The default value is: kind
+     */
+    @WithDefault("kind")
+    String clusterType();
+
+    /**
+     * The hostname of the argocd ingress route
+     */
+    @WithDefault("argocd.localtest.me")
+    String hostName();
+
+    /**
+     * The host port to be used on the host machine
+     */
+    @WithDefault("8443")
+    String hostPort();
+
+}
