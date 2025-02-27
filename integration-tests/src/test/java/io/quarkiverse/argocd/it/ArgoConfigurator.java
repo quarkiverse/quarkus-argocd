@@ -1,5 +1,6 @@
 package io.quarkiverse.argocd.it;
 
+import lombok.Builder.Default;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,13 +13,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ArgoConfigurator {
-    @Builder.Default
+    @Default
     private String projectName = "default";
 
-    @Builder.Default
+    @Default
     private String projectNamespace = "argocd";
 
-    @Builder.Default
+    @Default
     private String destinationKubeServer = "https://kubernetes.default.svc";
     private String destinationNamespace;
 
@@ -26,14 +27,14 @@ public class ArgoConfigurator {
 
     private String gitUrl;
 
-    @Builder.Default
+    @Default
     private String gitRevision = "main";
 
     private String applicationName;
     private String applicationNamespace;
 
-    @Builder.Default
+    @Default
     private String helmUrl = "https://github.com/argoproj/argocd-example-apps.git";
-    @Builder.Default
+    @Default
     private String helmPath = "helm-guestbook";
 }
