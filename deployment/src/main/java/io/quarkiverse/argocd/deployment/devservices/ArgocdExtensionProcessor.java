@@ -228,7 +228,6 @@ public class ArgocdExtensionProcessor {
 
         argocdDevServiceInfoBuildItemBuildProducer.produce(
                 new ArgocdDevServiceInfoBuildItem(
-                        "argocd",
                         argoConfig.hostName(),
                         Integer.parseInt(argoConfig.hostPort()),
                         "admin",

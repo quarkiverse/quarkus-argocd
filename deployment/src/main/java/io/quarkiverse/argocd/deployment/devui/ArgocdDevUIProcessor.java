@@ -23,12 +23,12 @@ public class ArgocdDevUIProcessor {
         LOG.debug("Creating card page");
 
         info.ifPresent(i -> {
-            String url = String.format("https://%s.%s:%s", i.argocdHostPrefix(), i.host(), i.hostPort());
+            String url = String.format("https://%s:%s", i.host(), i.hostPort());
             LOG.debug("Creating an external link page for: argocd UI");
             card.addPage(Page.externalPageBuilder("Argocd Dashboard")
                     .doNotEmbed()
                     .icon("font-awesome-solid:code-branch")
-                    .url(url, url));
+                    .url(url));
         });
 
         LOG.debug("Creating an external link page for: argocd project & version");

@@ -7,16 +7,13 @@ import io.quarkus.builder.item.SimpleBuildItem;
  */
 public final class ArgocdDevServiceInfoBuildItem extends SimpleBuildItem {
 
-    private final String argocdHostPrefix;
     private final String hostName;
     private final int hostPort;
 
     private final String adminUsername;
     private final String adminPassword;
 
-    public ArgocdDevServiceInfoBuildItem(String argocdHostPrefix, String hostName, int hostPort, String adminUsername,
-            String adminPassword) {
-        this.argocdHostPrefix = argocdHostPrefix;
+    public ArgocdDevServiceInfoBuildItem(String hostName, int hostPort, String adminUsername, String adminPassword) {
         this.hostName = hostName;
         this.hostPort = hostPort;
         this.adminUsername = adminUsername;
@@ -37,9 +34,5 @@ public final class ArgocdDevServiceInfoBuildItem extends SimpleBuildItem {
 
     public String adminPassword() {
         return adminPassword;
-    }
-
-    public String argocdHostPrefix() {
-        return argocdHostPrefix;
     }
 }
