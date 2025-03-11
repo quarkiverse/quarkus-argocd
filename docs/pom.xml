@@ -18,6 +18,12 @@
             <artifactId>quarkus-argocd-deployment</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- Documentation site generator: Antora -->
+        <dependency>
+            <groupId>io.quarkiverse.antora</groupId>
+            <artifactId>quarkus-antora</artifactId>
+            <version>1.1.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -72,6 +78,11 @@
                                     <directory>${project.basedir}/templates/includes</directory>
                                     <include>attributes.adoc</include>
                                     <filtering>true</filtering>
+                                </resource>
+                                <resource>
+                                    <directory>${project.basedir}/../</directory>
+                                    <include>readme.adoc</include>
+                                    <filtering>false</filtering>
                                 </resource>
                             </resources>
                         </configuration>
