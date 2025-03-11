@@ -1,4 +1,4 @@
-package io.quarkiverse.quarkus.argocd.runtime;
+package io.quarkiverse.argocd.runtime;
 
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
