@@ -70,8 +70,8 @@ public class ArgocdExtensionProcessor {
 
         if (!argoConfig.enabled() && !kubeServiceInfo.isPresent()) {
             // Argocd Dev Service not enabled and Kubernetes test container has not been created ...
-            throw new RuntimeException(
-                    "Dev services is not enabled for Argo CD and Kubernetes test container has not been created ...");
+            LOG.warn("Dev services is not enabled for Argo CD and Kubernetes test container has not been created ...");
+            return;
         }
 
         // Convert the kube config yaml to its Java Class
@@ -238,6 +238,8 @@ public class ArgocdExtensionProcessor {
                 kubeServiceInfo.get().getContainerId(),
                 new ContainerShutdownCloseable(new DummyContainer(), ArgoCDProcessor.FEATURE),
                 configOverrides).toBuildItem());
+
+        LOG.info("Created the argocd platform on kind ...");
     }
 
     private class DummyContainer extends GenericContainer<DummyContainer> implements Closeable {
