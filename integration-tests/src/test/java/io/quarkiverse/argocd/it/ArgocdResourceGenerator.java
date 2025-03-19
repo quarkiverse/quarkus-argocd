@@ -1,5 +1,6 @@
 package io.quarkiverse.argocd.it;
 
+import io.quarkiverse.argocd.it.model.ArgoConfigurator;
 import io.quarkiverse.argocd.v1alpha1.AppProject;
 import io.quarkiverse.argocd.v1alpha1.AppProjectBuilder;
 import io.quarkiverse.argocd.v1alpha1.Application;
@@ -7,46 +8,46 @@ import io.quarkiverse.argocd.v1alpha1.ApplicationBuilder;
 
 public class ArgocdResourceGenerator {
 
-    public static AppProject populateProject(ArgoConfigurator argoConfigurator) {
+    public static AppProject populateProject(ArgoConfigurator config) {
         // @formatter:off
         var projectBuilder = new AppProjectBuilder()
           .withNewMetadata()
-            .withName(argoConfigurator.getProjectName())
-            .withNamespace(argoConfigurator.getProjectNamespace())
+            .withName(config.getAppProjectConfig().getName())
+            .withNamespace(config.getAppProjectConfig().getNamespace())
           .endMetadata()
           .withNewSpec()
             .addNewDestination()
-              .withNamespace(argoConfigurator.getDestinationNamespace())
-              .withServer(argoConfigurator.getDestinationKubeServer())
+              .withNamespace(config.getAppProjectConfig().getDestinationNamespace())
+              .withServer(config.getAppProjectConfig().getDestinationKubeServer())
             .endDestination()
-          .withSourceRepos(argoConfigurator.getGitUrl())
+            .withSourceRepos(config.getAppProjectConfig().getGitUrl())
           .endSpec();
 
-        if (argoConfigurator.getSourceNamespaces() != null) {
-            projectBuilder.editOrNewSpec().withSourceNamespaces(argoConfigurator.getSourceNamespaces()).endSpec();
+        if (config.getAppProjectConfig().getSourceNamespaces() != null) {
+            projectBuilder.editOrNewSpec().withSourceNamespaces(config.getAppProjectConfig().getSourceNamespaces()).endSpec();
         }
 
         // @formatter:on
         return projectBuilder.build();
     }
 
-    public static Application populateApplication(ArgoConfigurator argoConfigurator) {
+    public static Application populateApplication(ArgoConfigurator config) {
         // @formatter:off
         Application application = new ApplicationBuilder()
                 .withNewMetadata()
-                  .withName(argoConfigurator.getApplicationName())
-                  .withNamespace(argoConfigurator.getApplicationNamespace())
+                  .withName(config.getApplicationConfig().getName())
+                  .withNamespace(config.getApplicationConfig().getNamespace())
                 .endMetadata()
                 .withNewSpec()
-                  .withProject(argoConfigurator.getProjectName())
+                  .withProject(config.getApplicationConfig().getAppProjectName())
                   .withNewDestination()
-                    .withServer(argoConfigurator.getDestinationKubeServer())
-                    .withNamespace(argoConfigurator.getApplicationNamespace())
+                    .withServer(config.getApplicationConfig().getDestinationKubeServer())
+                    .withNamespace(config.getApplicationConfig().getDestinationNamespace())
                   .endDestination()
                   .withNewSource()
-                    .withPath(argoConfigurator.getHelmPath())
-                    .withRepoURL(argoConfigurator.getHelmUrl())
-                    .withTargetRevision(argoConfigurator.getGitRevision())
+                    .withPath(config.getApplicationConfig().getHelmPath())
+                    .withRepoURL(config.getApplicationConfig().getHelmUrl())
+                    .withTargetRevision(config.getApplicationConfig().getGitRevision())
                     .withNewHelm()
                       .withValueFiles("values.yaml")
                       //.endHelm()

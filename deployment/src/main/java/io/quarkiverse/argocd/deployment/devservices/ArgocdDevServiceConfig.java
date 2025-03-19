@@ -35,11 +35,11 @@ public interface ArgocdDevServiceConfig {
     String version();
 
     /**
-     * The Argocd controllers namespace where: Application, ApplicationSet, etc. are deployed and running
+     * The Argocd control plane namespace where AppProject or Application CR are deployed
      * The default namespace is: argocd
      */
     @WithDefault("argocd")
-    String controllerNamespace();
+    String controlPlaneNamespace();
 
     /**
      * Time to wait till a resource is ready: pod, etc

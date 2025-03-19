@@ -6,13 +6,13 @@ Generate Argo CD Application as part of the Quarkus build or the Quarkus CLI.
 
 ## Features
 
-- Generate the Argo CD Application Kubernetes CR for the Quarkus application
+- Generate the Argo CD Application Kubernetes CR for the Quarkus applicationConfig
 - Command Line interface to install / uninstall and list Argo CD Application(s)
 - Integration with Quarkus Helm
 
 ## Requirements
 - Project added under version control and pushed on a repository (e.g. GitHub, etc.)
-- A Kubernetes cluster with Argo CD [installed](https://argo-cd.readthedocs.io/en/stable/getting_started/#1-install-argo-cd) and [supporting](https://argo-cd.readthedocs.io/en/stable/user-guide/application-specification/) `argoproj.io/v1alpha1`.
+- A Kubernetes cluster with Argo CD [installed](https://argo-cd.readthedocs.io/en/stable/getting_started/#1-install-argo-cd) and [supporting](https://argo-cd.readthedocs.io/en/stable/user-guide/applicationConfig-specification/) `argoproj.io/v1alpha1`.
 
 ## Building
 
@@ -67,7 +67,7 @@ To re-trigger the file generation:
 quarkus argocd project generate
 ```
 
-#### Installing the application
+#### Installing the applicationConfig
 
 To install generated `Application` CR to the currently connected Kubernetes cluster:
 

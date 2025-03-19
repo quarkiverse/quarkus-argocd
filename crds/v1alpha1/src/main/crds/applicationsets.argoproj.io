@@ -15295,7 +15295,7 @@ spec:
               applicationStatus:
                 items:
                   properties:
-                    application:
+                    applicationConfig:
                       type: string
                     lastTransitionTime:
                       format: date-time
@@ -15307,7 +15307,7 @@ spec:
                     step:
                       type: string
                   required:
-                  - application
+                  - applicationConfig
                   - message
                   - status
                   - step

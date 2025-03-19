@@ -2704,7 +2704,7 @@ spec:
                           properties:
                             address:
                               type: string
-                            application:
+                            applicationConfig:
                               type: string
                             canaryConfigName:
                               type: string
@@ -2779,7 +2779,7 @@ spec:
                               type: object
                           required:
                           - address
-                          - application
+                          - applicationConfig
                           - canaryConfigName
                           - configurationAccountName
                           - metricsAccountName
