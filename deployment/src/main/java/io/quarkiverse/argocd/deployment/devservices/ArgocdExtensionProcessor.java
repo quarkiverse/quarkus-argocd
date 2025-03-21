@@ -117,7 +117,7 @@ public class ArgocdExtensionProcessor {
                         "app.kubernetes.io/component", "controller"),
                 "ingress-nginx");
 
-        var ARGOCD_CONTROLLER_NAMESPACE = argoConfig.controllerNamespace();
+        var ARGOCD_CONTROLLER_NAMESPACE = argoConfig.controlPlaneNamespace();
         // Install the Argocd resources from the YAML manifest file
         items = client.load(Utils.fetchArgocdResourcesFromURL(argoConfig.version())).items();
 

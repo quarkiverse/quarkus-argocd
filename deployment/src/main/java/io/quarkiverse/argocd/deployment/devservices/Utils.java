@@ -71,18 +71,18 @@ public class Utils {
 
     protected static void waitTillArgocdPodIsReady(String name) {
         client.resources(Pod.class)
-                .inNamespace(config.controllerNamespace())
+                .inNamespace(config.controlPlaneNamespace())
                 .withName(name)
                 .waitUntilReady(config.timeOut(), TimeUnit.SECONDS);
-        LOG.infof("Pod: %s ready in %s", name, config.controllerNamespace());
+        LOG.infof("Pod: %s ready in %s", name, config.controlPlaneNamespace());
     }
 
     protected static void waitTillArgocdPodSelectedByLabelIsReady(String key, String value) {
         client.resources(Pod.class)
-                .inNamespace(config.controllerNamespace())
+                .inNamespace(config.controlPlaneNamespace())
                 .withLabel(key, value)
                 .waitUntilReady(config.timeOut(), TimeUnit.SECONDS);
-        LOG.infof("Pod: %s ready in %s", value, config.controllerNamespace());
+        LOG.infof("Pod: %s ready in %s", value, config.controlPlaneNamespace());
     }
 
     public static void setKubernetesClient(KubernetesClient client) {
