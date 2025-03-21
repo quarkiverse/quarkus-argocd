@@ -181,11 +181,7 @@ public class ArgoCDProcessor {
         // @formatter:on
 
         ArgoCDResourceList<HasMetadata> resourceList = new ArgoCDResourceList<>();
-        if (appProject != null) {
-            resourceList.setItems(List.of(appProject, deploy));
-        } else {
-            resourceList.setItems(List.of(deploy));
-        }
+        resourceList.setItems(appProject != null ? List.of(appProject, deploy) : List.of(deploy));
         resourceListProducer.produce(new ArgoCDResourceListBuildItem(resourceList));
     }
 
