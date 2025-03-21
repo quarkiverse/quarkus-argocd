@@ -103,31 +103,31 @@ public class ArgoCDProcessor {
                 : ARGOCD_CONTROL_PLANE_NAMESPACE_KUBE;
 
         /**
-         * the Application CR namespace is by default the same as the Argocd control plane namespace. See the property:
+         * The Application CR namespace is by default the same as the Argocd control plane namespace. See the property:
          * controlPlaneNamespace
          * If the user configure Argocd to support "Applications in any Namespace", then it can be overridden.
          */
-        String applicationCustomResourceNamespace = config.applicationCustomResourceNamespace().orElse(controlPlaneNamespace);
+        String applicationCustomResourceNamespace = config.application().namespace().orElse(controlPlaneNamespace);
 
         Path helmOutputDir = customHelmOutputDir.map(CustomHelmOutputDirBuildItem::getOutputDir).orElse(Paths.get(".helm"));
 
         // @formatter:off
         AppProjectBuilder builder = new AppProjectBuilder()
           .withNewMetadata()
-            .withName(config.appProjectName().orElse(applicationInfo.getName()))
+            .withName(config.appProject().name().orElse(applicationInfo.getName()))
             .withNamespace(controlPlaneNamespace)
           .endMetadata()
           .withNewSpec()
             .addNewDestination()
               .withNamespace(config.destinationNamespace().orElse(null))
-              .withServer(config.server())
+              .withServer(config.appProject().server())
             .endDestination()
             .withSourceRepos(scmInfo.getDefaultRemoteUrl())
           .endSpec();
 
-        if (config.applicationCustomResourceNamespace().isPresent()) {
+        if (config.application().namespace().isPresent()) {
             builder.editOrNewSpec()
-                .withSourceNamespaces(config.applicationCustomResourceNamespace().get())
+                .withSourceNamespaces(config.application().namespace().get())
                 .endSpec();
         }
         AppProject appProject = builder.build();
@@ -141,9 +141,9 @@ public class ArgoCDProcessor {
                   .withNamespace(applicationCustomResourceNamespace)
                 .endMetadata()
                 .withNewSpec()
-                  .withProject(config.appProjectName().orElse(applicationInfo.getName()))
+                  .withProject(config.appProject().name().orElse(applicationInfo.getName()))
                   .withNewDestination()
-                    .withServer(config.server())
+                    .withServer(config.appProject().server())
                     .withNamespace(config.destinationNamespace().orElse("null"))
                   .endDestination()
                   .withNewSource()

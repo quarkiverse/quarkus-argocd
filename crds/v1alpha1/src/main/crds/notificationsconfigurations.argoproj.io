@@ -60,7 +60,7 @@ spec:
               subscriptions:
                 additionalProperties:
                   type: string
-                description: Subscriptions contain centrally managed global applicationConfig
+                description: Subscriptions contain centrally managed global application
                   subscriptions
                 type: object
               templates:
