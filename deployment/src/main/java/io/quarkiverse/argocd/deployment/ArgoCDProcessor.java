@@ -111,28 +111,36 @@ public class ArgoCDProcessor {
 
         Path helmOutputDir = customHelmOutputDir.map(CustomHelmOutputDirBuildItem::getOutputDir).orElse(Paths.get(".helm"));
 
-        // @formatter:off
-        AppProjectBuilder builder = new AppProjectBuilder()
-          .withNewMetadata()
-            .withName(config.appProject().name().orElse(applicationInfo.getName()))
-            .withNamespace(controlPlaneNamespace)
-          .endMetadata()
-          .withNewSpec()
-            .addNewDestination()
-              .withNamespace(config.destinationNamespace().orElse(null))
-              .withServer(config.server())
-            .endDestination()
-            .withSourceRepos(scmInfo.getDefaultRemoteUrl())
-          .endSpec();
+        AppProject appProject = null;
+        // If the user specifies as AppProject name "default", then we don't generate the CR as it already exists on the cluster
+        if (Optional.ofNullable(config.appProject())
+                .flatMap(ArgoCDConfiguration.AppProject::name)
+                .filter(name -> name.equals("default"))
+                .isPresent()) {
+            log.warn("The AppProject CR is not generated as the user selected to use the default !");
+        } else {
+            AppProjectBuilder builder = new AppProjectBuilder();
+            // @formatter:off
+            builder.withNewMetadata()
+                .withName(config.appProject().name().orElse(applicationInfo.getName()))
+                .withNamespace(controlPlaneNamespace)
+              .endMetadata()
+              .withNewSpec()
+                .addNewDestination()
+                  .withNamespace(config.destinationNamespace().orElse(null))
+                  .withServer(config.server())
+                .endDestination()
+                .withSourceRepos(scmInfo.getDefaultRemoteUrl())
+              .endSpec();
 
-        if (config.application().namespace().isPresent()) {
-            builder.editOrNewSpec()
-                .withSourceNamespaces(config.application().namespace().get())
-                .endSpec();
+            if (config.application().namespace().isPresent()) {
+                builder.editOrNewSpec()
+                    .withSourceNamespaces(config.application().namespace().get())
+                    .endSpec();
+            }
+            // @formatter:on
+            appProject = builder.build();
         }
-        AppProject appProject = builder.build();
-
-        // @formatter:on
 
         // @formatter:off
         Application deploy = new ApplicationBuilder()
@@ -173,7 +181,11 @@ public class ArgoCDProcessor {
         // @formatter:on
 
         ArgoCDResourceList<HasMetadata> resourceList = new ArgoCDResourceList<>();
-        resourceList.setItems(List.of(appProject, deploy));
+        if (appProject != null) {
+            resourceList.setItems(List.of(appProject, deploy));
+        } else {
+            resourceList.setItems(List.of(deploy));
+        }
         resourceListProducer.produce(new ArgoCDResourceListBuildItem(resourceList));
     }
 
