@@ -120,7 +120,7 @@ public class ArgoCDProcessor {
           .withNewSpec()
             .addNewDestination()
               .withNamespace(config.destinationNamespace().orElse(null))
-              .withServer(config.appProject().server())
+              .withServer(config.server())
             .endDestination()
             .withSourceRepos(scmInfo.getDefaultRemoteUrl())
           .endSpec();
@@ -143,7 +143,7 @@ public class ArgoCDProcessor {
                 .withNewSpec()
                   .withProject(config.appProject().name().orElse(applicationInfo.getName()))
                   .withNewDestination()
-                    .withServer(config.appProject().server())
+                    .withServer(config.server())
                     .withNamespace(config.destinationNamespace().orElse(null))
                   .endDestination()
                   .withNewSource()

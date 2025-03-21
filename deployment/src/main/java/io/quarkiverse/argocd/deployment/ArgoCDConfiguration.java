@@ -11,6 +11,12 @@ import io.smallrye.config.WithDefault;
 public interface ArgoCDConfiguration {
 
     /**
+     * The Kubernetes API Server URL.
+     */
+    @WithDefault("https://kubernetes.default.svc")
+    String server();
+
+    /**
      * The target/destination namespace where the resources of the runtime should be installed from the Helm chart, kustomize,
      * etc
      */
@@ -29,11 +35,6 @@ public interface ArgoCDConfiguration {
     AppProject appProject();
 
     interface AppProject {
-        /**
-         * The Kubernetes API Server URL.
-         */
-        @WithDefault("https://kubernetes.default.svc")
-        String server();
 
         /**
          * The name of the ArgoCD AppProject CR.
