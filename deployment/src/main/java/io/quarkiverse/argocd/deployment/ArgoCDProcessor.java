@@ -144,7 +144,7 @@ public class ArgoCDProcessor {
                   .withProject(config.appProject().name().orElse(applicationInfo.getName()))
                   .withNewDestination()
                     .withServer(config.appProject().server())
-                    .withNamespace(config.destinationNamespace().orElse("null"))
+                    .withNamespace(config.destinationNamespace().orElse(null))
                   .endDestination()
                   .withNewSource()
                     .withPath(helmOutputDir.resolve("kubernetes").resolve(applicationInfo.getName()).toString()) //TODO: Get target deployment target.
