@@ -66,11 +66,11 @@ public class InstallCommand extends GenerationBaseCommand {
             return true;
         }
         if (Git.hasUncommittedChanges() && !Prompt.yesOrNo(false,
-                "Remote git repository has uncommitted chagnes. Do you still want to proceed (y/N)?")) {
+                "Remote git repository has uncommitted changes. Do you still want to proceed (y/N)?")) {
             return true;
         }
         if (Git.hasUnpushedChanges(repoURL)
-                && !Prompt.yesOrNo(false, "Remote git repository has unpushed chagnes. Do you still want to proceed (y/N)?")) {
+                && !Prompt.yesOrNo(false, "Remote git repository has unpushed changes. Do you still want to proceed (y/N)?")) {
             return true;
         }
         return false;
