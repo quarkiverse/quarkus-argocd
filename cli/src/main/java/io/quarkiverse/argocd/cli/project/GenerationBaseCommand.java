@@ -32,22 +32,32 @@ public abstract class GenerationBaseCommand extends ProjectBaseCommand implement
     private static final ArtifactDependency QUARKUS_ARGOCD = new ArtifactDependency("io.quarkiverse.argocd", "quarkus-argocd",
             null, "jar", GenerationBaseCommand.getVersion());
 
-    @Option(names = { "-n",
-            "--namespace" }, description = "The target namespace (where the Custom Resources will be installed)")
-    Optional<String> namespace = Optional.empty();
+    @Option(names = {
+            "--server" }, description = "The Kubernetes API Server URL. Default value is: https://kubernetes.default.svc")
+    Optional<String> kubernetesApiUrl = Optional.empty();
 
     @Option(names = {
-            "--app-namespace" }, description = "The target application namespace (where the Applications will be installed)")
+            "--appproject-namespace" }, description = "The Argo CD control plane namespace where the AppProject Custom Resource will be installed. This namespace property is optional and is calculated according to the target platform: kubernetes or OpenShift")
+    Optional<String> appProjectNamespace = Optional.empty();
+
+    @Option(names = {
+            "--application-namespace" }, description = "The namespace where the Application Custom Resource will be installed. This namespace property should be the same as the AppProject except if Argo CD is configured to support: applications in any namespace")
     Optional<String> applicationNamespace = Optional.empty();
 
-    @Option(names = { "-p", "--project" }, description = "The target project")
+    @Option(names = {
+            "--destination-namespace" }, description = "The target/destination namespace where the resources of the runtime should be installed from the Helm chart, kustomize, etc.")
+    Optional<String> destinationNamespace = Optional.empty();
+
+    @Option(names = { "-p", "--project-name" }, description = "The project name")
     Optional<String> project = Optional.empty();
 
     public Properties getBuildSystemProperties() {
         Properties buildSystemProperties = new Properties();
-        namespace.ifPresent(v -> buildSystemProperties.setProperty("quarkus.argocd.namespace", v));
-        applicationNamespace.ifPresent(v -> buildSystemProperties.setProperty("quarkus.argocd.application-namespace", v));
-        project.ifPresent(v -> buildSystemProperties.setProperty("quarkus.argocd.project", v));
+        kubernetesApiUrl.ifPresent(v -> buildSystemProperties.put("quarkus.argocd.server", v));
+        destinationNamespace.ifPresent(v -> buildSystemProperties.setProperty("quarkus.argocd.destination-namespace", v));
+        appProjectNamespace.ifPresent(v -> buildSystemProperties.setProperty("quarkus.argocd.app-project.namespace", v));
+        applicationNamespace.ifPresent(v -> buildSystemProperties.setProperty("quarkus.argocd.application.namespace", v));
+        project.ifPresent(v -> buildSystemProperties.setProperty("quarkus.argocd.app-project.name", v));
         return buildSystemProperties;
     }
 
@@ -72,13 +82,13 @@ public abstract class GenerationBaseCommand extends ProjectBaseCommand implement
             return ExitCode.USAGE;
         }
 
-        Path targetDirecotry = projectRoot.resolve(buildTool.getBuildDirectory());
+        Path targetDirectory = projectRoot.resolve(buildTool.getBuildDirectory());
         QuarkusBootstrap quarkusBootstrap = QuarkusBootstrap.builder()
                 .setMode(QuarkusBootstrap.Mode.PROD)
                 .setBuildSystemProperties(getBuildSystemProperties())
                 .setApplicationRoot(getWorkingDirectory())
                 .setProjectRoot(getWorkingDirectory())
-                .setTargetDirectory(targetDirecotry)
+                .setTargetDirectory(targetDirectory)
                 .setIsolateDeployment(false)
                 .setRebuild(true)
                 .setLocalProjectDiscovery(true)
