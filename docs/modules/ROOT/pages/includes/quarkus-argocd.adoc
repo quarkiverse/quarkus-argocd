@@ -1,21 +1,253 @@
-
-:summaryTableId: quarkus-argocd
 [.configuration-legend]
 icon:lock[title=Fixed at build time] Configuration property fixed at build time - All other configuration properties are overridable at runtime
 [.configuration-reference.searchable, cols="80,.^10,.^10"]
 |===
 
-h|[[quarkus-argocd_configuration]]link:#quarkus-argocd_configuration[Configuration property]
-
+h|[.header-title]##Configuration property##
 h|Type
 h|Default
 
-a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-server]]`link:#quarkus-argocd_quarkus-argocd-server[quarkus.argocd.server]`
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-devservices-enabled]] [.property-path]##link:#quarkus-argocd_quarkus-argocd-devservices-enabled[`quarkus.argocd.devservices.enabled`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.argocd.devservices.enabled+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Enable the ArgoCD DevService.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_DEVSERVICES_ENABLED+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_ARGOCD_DEVSERVICES_ENABLED+++`
+endif::add-copy-button-to-env-var[]
+--
+|boolean
+|`true`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-devservices-debug-enabled]] [.property-path]##link:#quarkus-argocd_quarkus-argocd-devservices-debug-enabled[`quarkus.argocd.devservices.debug-enabled`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.argocd.devservices.debug-enabled+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Enable the debugging level.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_DEVSERVICES_DEBUG_ENABLED+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_ARGOCD_DEVSERVICES_DEBUG_ENABLED+++`
+endif::add-copy-button-to-env-var[]
+--
+|boolean
+|`false`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-devservices-show-logs]] [.property-path]##link:#quarkus-argocd_quarkus-argocd-devservices-show-logs[`quarkus.argocd.devservices.show-logs`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.argocd.devservices.show-logs+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+If logs should be shown from the Argocd container.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_DEVSERVICES_SHOW_LOGS+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_ARGOCD_DEVSERVICES_SHOW_LOGS+++`
+endif::add-copy-button-to-env-var[]
+--
+|boolean
+|`false`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-devservices-version]] [.property-path]##link:#quarkus-argocd_quarkus-argocd-devservices-version[`quarkus.argocd.devservices.version`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.argocd.devservices.version+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+The version of Argocd to be installed from the GitHub repository It can be: "latest" or a tagged release expressed as such: "v2.13.2"
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_DEVSERVICES_VERSION+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_ARGOCD_DEVSERVICES_VERSION+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|`v2.13.2`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-devservices-control-plane-namespace]] [.property-path]##link:#quarkus-argocd_quarkus-argocd-devservices-control-plane-namespace[`quarkus.argocd.devservices.control-plane-namespace`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.argocd.devservices.control-plane-namespace+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+The Argocd control plane namespace where AppProject or Application CR are deployed The default namespace is: argocd
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_DEVSERVICES_CONTROL_PLANE_NAMESPACE+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_ARGOCD_DEVSERVICES_CONTROL_PLANE_NAMESPACE+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|`argocd`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-devservices-time-out]] [.property-path]##link:#quarkus-argocd_quarkus-argocd-devservices-time-out[`quarkus.argocd.devservices.time-out`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.argocd.devservices.time-out+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Time to wait till a resource is ready: pod, etc The default value is: 180 seconds
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_DEVSERVICES_TIME_OUT+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_ARGOCD_DEVSERVICES_TIME_OUT+++`
+endif::add-copy-button-to-env-var[]
+--
+|long
+|`180`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-devservices-cluster-type]] [.property-path]##link:#quarkus-argocd_quarkus-argocd-devservices-cluster-type[`quarkus.argocd.devservices.cluster-type`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.argocd.devservices.cluster-type+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+The cluster type to be used: kind or k3 The default value is: kind
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_DEVSERVICES_CLUSTER_TYPE+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_ARGOCD_DEVSERVICES_CLUSTER_TYPE+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|`kind`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-devservices-host-name]] [.property-path]##link:#quarkus-argocd_quarkus-argocd-devservices-host-name[`quarkus.argocd.devservices.host-name`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.argocd.devservices.host-name+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+The hostname of the argocd ingress route
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_DEVSERVICES_HOST_NAME+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_ARGOCD_DEVSERVICES_HOST_NAME+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|`argocd.localtest.me`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-devservices-host-port]] [.property-path]##link:#quarkus-argocd_quarkus-argocd-devservices-host-port[`quarkus.argocd.devservices.host-port`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.argocd.devservices.host-port+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+The host port to be used on the host machine
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_DEVSERVICES_HOST_PORT+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_ARGOCD_DEVSERVICES_HOST_PORT+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|`8443`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-devservices-ingress-version]] [.property-path]##link:#quarkus-argocd_quarkus-argocd-devservices-ingress-version[`quarkus.argocd.devservices.ingress.version`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.argocd.devservices.ingress.version+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+The version of the Ingress controller to be installed from the GitHub repository If not specified, it will use the resources published on main branch The version to be used should be specified using the tagged release: v1.12.0, etc
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_DEVSERVICES_INGRESS_VERSION+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_ARGOCD_DEVSERVICES_INGRESS_VERSION+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|`latest`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-devservices-ingress-port-forward-enabled]] [.property-path]##link:#quarkus-argocd_quarkus-argocd-devservices-ingress-port-forward-enabled[`quarkus.argocd.devservices.ingress.port-forward-enabled`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.argocd.devservices.ingress.port-forward-enabled+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Enable to forward the ingress traffic from the container to the local host
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_DEVSERVICES_INGRESS_PORT_FORWARD_ENABLED+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_ARGOCD_DEVSERVICES_INGRESS_PORT_FORWARD_ENABLED+++`
+endif::add-copy-button-to-env-var[]
+--
+|boolean
+|`true`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-server]] [.property-path]##link:#quarkus-argocd_quarkus-argocd-server[`quarkus.argocd.server`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.argocd.server+++[]
+endif::add-copy-button-to-config-props[]
 
 
 [.description]
 --
 The Kubernetes API Server URL.
+
 
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_SERVER+++[]
@@ -23,50 +255,41 @@ endif::add-copy-button-to-env-var[]
 ifndef::add-copy-button-to-env-var[]
 Environment variable: `+++QUARKUS_ARGOCD_SERVER+++`
 endif::add-copy-button-to-env-var[]
---|string 
+--
+|string
 |`https://kubernetes.default.svc`
 
-
-a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-project]]`link:#quarkus-argocd_quarkus-argocd-project[quarkus.argocd.project]`
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-destination-namespace]] [.property-path]##link:#quarkus-argocd_quarkus-argocd-destination-namespace[`quarkus.argocd.destination-namespace`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.argocd.destination-namespace+++[]
+endif::add-copy-button-to-config-props[]
 
 
 [.description]
 --
-The ArgoCDD project.
+The target/destination namespace where the resources of the runtime should be installed from the Helm chart, kustomize, etc
+
 
 ifdef::add-copy-button-to-env-var[]
-Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_PROJECT+++[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_DESTINATION_NAMESPACE+++[]
 endif::add-copy-button-to-env-var[]
 ifndef::add-copy-button-to-env-var[]
-Environment variable: `+++QUARKUS_ARGOCD_PROJECT+++`
+Environment variable: `+++QUARKUS_ARGOCD_DESTINATION_NAMESPACE+++`
 endif::add-copy-button-to-env-var[]
---|string 
+--
+|string
 |
 
-
-a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-namespace]]`link:#quarkus-argocd_quarkus-argocd-namespace[quarkus.argocd.namespace]`
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-target-revision]] [.property-path]##link:#quarkus-argocd_quarkus-argocd-target-revision[`quarkus.argocd.target-revision`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.argocd.target-revision+++[]
+endif::add-copy-button-to-config-props[]
 
 
 [.description]
 --
-The target namespace.
+The target revision of the repository fetched by ArgoCd from the url Defaults to HEAD.
 
-ifdef::add-copy-button-to-env-var[]
-Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_NAMESPACE+++[]
-endif::add-copy-button-to-env-var[]
-ifndef::add-copy-button-to-env-var[]
-Environment variable: `+++QUARKUS_ARGOCD_NAMESPACE+++`
-endif::add-copy-button-to-env-var[]
---|string 
-|
-
-
-a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-target-revision]]`link:#quarkus-argocd_quarkus-argocd-target-revision[quarkus.argocd.target-revision]`
-
-
-[.description]
---
-The target revision. Defaults to HEAD.
 
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_TARGET_REVISION+++[]
@@ -74,7 +297,72 @@ endif::add-copy-button-to-env-var[]
 ifndef::add-copy-button-to-env-var[]
 Environment variable: `+++QUARKUS_ARGOCD_TARGET_REVISION+++`
 endif::add-copy-button-to-env-var[]
---|string 
+--
+|string
 |`HEAD`
 
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-app-project-name]] [.property-path]##link:#quarkus-argocd_quarkus-argocd-app-project-name[`quarkus.argocd.app-project.name`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.argocd.app-project.name+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+The name of the ArgoCD AppProject CR. A AppProject CR exists by default with full permissions - https://argo-cd.readthedocs.io/en/stable/user-guide/projects/++#++the-default-project and is named "default"
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_APP_PROJECT_NAME+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_ARGOCD_APP_PROJECT_NAME+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|
+
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-app-project-namespace]] [.property-path]##link:#quarkus-argocd_quarkus-argocd-app-project-namespace[`quarkus.argocd.app-project.namespace`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.argocd.app-project.namespace+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+The AppProject CR namespace. This namespace refers to the Argocd control plane namespace. The value is either 'argocd' or 'openshift-gitops' and is calculated by the extension according to the DeploymentTarget platform: kubernetes or openshift. Remark: It is then not needed for a user to define it
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_APP_PROJECT_NAMESPACE+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_ARGOCD_APP_PROJECT_NAMESPACE+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|
+
+a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-application-namespace]] [.property-path]##link:#quarkus-argocd_quarkus-argocd-application-namespace[`quarkus.argocd.application.namespace`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.argocd.application.namespace+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+The namespace. The ApplicationCR should be installed under the Argocd control plan namespace like the AppProject CR Remark: It is nevertheless possible to install it in another namespace if "Application in any namespaces is enabled: https://argo-cd.readthedocs.io/en/stable/operator-manual/app-any-namespace/"
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ARGOCD_APPLICATION_NAMESPACE+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_ARGOCD_APPLICATION_NAMESPACE+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|
+
 |===
+
