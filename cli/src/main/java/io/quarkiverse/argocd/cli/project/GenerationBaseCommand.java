@@ -82,13 +82,13 @@ public abstract class GenerationBaseCommand extends ProjectBaseCommand implement
             return ExitCode.USAGE;
         }
 
-        Path targetDirecotry = projectRoot.resolve(buildTool.getBuildDirectory());
+        Path targetDirectory = projectRoot.resolve(buildTool.getBuildDirectory());
         QuarkusBootstrap quarkusBootstrap = QuarkusBootstrap.builder()
                 .setMode(QuarkusBootstrap.Mode.PROD)
                 .setBuildSystemProperties(getBuildSystemProperties())
                 .setApplicationRoot(getWorkingDirectory())
                 .setProjectRoot(getWorkingDirectory())
-                .setTargetDirectory(targetDirecotry)
+                .setTargetDirectory(targetDirectory)
                 .setIsolateDeployment(false)
                 .setRebuild(true)
                 .setLocalProjectDiscovery(true)
