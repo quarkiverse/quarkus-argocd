@@ -22,8 +22,9 @@ public class InstallCommand extends GenerationBaseCommand {
     void process(ArgoCDResourceList<?> resourceList) {
         List<ProjectListItem> projectItems = new ArrayList<>();
         List<ApplicationListItem> applicationItems = new ArrayList<>();
+        KubernetesClient kubernetesClient = new KubernetesClientBuilder().build();
 
-        //First pass check that all repositories are valid
+        // First pass check that all repositories are valid
         for (AppProject project : resourceList.getAppProjectList().getItems()) {
             for (String repoURL : project.getSpec().getSourceRepos()) {
                 if (shouldAbort(repoURL)) {
@@ -39,20 +40,32 @@ public class InstallCommand extends GenerationBaseCommand {
             }
         }
 
-        KubernetesClient kubernetesClient = new KubernetesClientBuilder().build();
-        for (AppProject project : resourceList.getAppProjectList().getItems()) {
-            String projectName = project.getMetadata().getName();
-            AppProject installedProject = kubernetesClient.resources(AppProject.class).resource(project).createOrReplace();
-
+        // If the list of the resource don't include an AppProject, this is because the user is using the default project one
+        if (resourceList.getAppProjectList().getItems().isEmpty()) {
             for (Application application : resourceList.getApplicationList().getItems()) {
-                if (!projectName.equals(application.getSpec().getProject())) {
+                if (!"default".equals(application.getSpec().getProject())) {
                     continue;
                 }
                 Application installedApplication = kubernetesClient.resources(Application.class).resource(application)
                         .createOrReplace();
                 applicationItems.add(ApplicationListItem.from(installedApplication));
             }
-            projectItems.add(new ProjectListItem(projectName, applicationItems));
+            projectItems.add(new ProjectListItem("default", applicationItems));
+        } else {
+            for (AppProject project : resourceList.getAppProjectList().getItems()) {
+                String projectName = project.getMetadata().getName();
+                AppProject installedProject = kubernetesClient.resources(AppProject.class).resource(project).createOrReplace();
+
+                for (Application application : resourceList.getApplicationList().getItems()) {
+                    if (!projectName.equals(application.getSpec().getProject())) {
+                        continue;
+                    }
+                    Application installedApplication = kubernetesClient.resources(Application.class).resource(application)
+                            .createOrReplace();
+                    applicationItems.add(ApplicationListItem.from(installedApplication));
+                }
+                projectItems.add(new ProjectListItem(projectName, applicationItems));
+            }
         }
 
         System.out.println("Installed ArgoCD projects:");
@@ -66,11 +79,11 @@ public class InstallCommand extends GenerationBaseCommand {
             return true;
         }
         if (Git.hasUncommittedChanges() && !Prompt.yesOrNo(false,
-                "Remote git repository has uncommitted chagnes. Do you still want to proceed (y/N)?")) {
+                "Remote git repository has uncommitted changes. Do you still want to proceed (y/N)?")) {
             return true;
         }
         if (Git.hasUnpushedChanges(repoURL)
-                && !Prompt.yesOrNo(false, "Remote git repository has unpushed chagnes. Do you still want to proceed (y/N)?")) {
+                && !Prompt.yesOrNo(false, "Remote git repository has unpushed changes. Do you still want to proceed (y/N)?")) {
             return true;
         }
         return false;

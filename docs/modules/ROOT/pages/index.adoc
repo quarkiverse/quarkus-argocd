@@ -1,8 +1,6 @@
-= Quarkus ArgoCD
-
 include::./includes/attributes.adoc[]
 
-TIP: Describe what the extension does here.
+include::./includes/readme.adoc[]
 
 == Installation
 
