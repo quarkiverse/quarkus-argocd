@@ -5,17 +5,20 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jboss.logging.Logger;
 
 import io.dekorate.utils.Git;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.quarkiverse.argocd.deployment.utils.Serialization;
-import io.quarkiverse.argocd.spi.ArgoCDApplicationListBuildItem;
 import io.quarkiverse.argocd.spi.ArgoCDOutputDirBuildItem;
+import io.quarkiverse.argocd.spi.ArgoCDResourceListBuildItem;
+import io.quarkiverse.argocd.v1alpha1.AppProject;
+import io.quarkiverse.argocd.v1alpha1.AppProjectBuilder;
 import io.quarkiverse.argocd.v1alpha1.Application;
 import io.quarkiverse.argocd.v1alpha1.ApplicationBuilder;
-import io.quarkiverse.argocd.v1alpha1.ApplicationList;
-import io.quarkiverse.argocd.v1alpha1.ApplicationListBuilder;
+import io.quarkiverse.argocd.v1alpha1.ArgoCDResourceList;
 import io.quarkiverse.helm.spi.CustomHelmOutputDirBuildItem;
 import io.quarkus.deployment.IsTest;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -24,12 +27,17 @@ import io.quarkus.deployment.builditem.ApplicationInfoBuildItem;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.GeneratedFileSystemResourceBuildItem;
 import io.quarkus.deployment.pkg.builditem.OutputTargetBuildItem;
+import io.quarkus.kubernetes.deployment.DeploymentTargetEntry;
+import io.quarkus.kubernetes.deployment.EnabledKubernetesDeploymentTargetsBuildItem;
 
-class ArgoCDProcessor {
+public class ArgoCDProcessor {
 
-    private static final String FEATURE = "argocd";
+    public static final String FEATURE = "argocd";
     private static final String DOT_GIT = ".git";
     private static final Logger log = Logger.getLogger(ArgoCDProcessor.class);
+
+    private static final String ARGOCD_CONTROL_PLANE_NAMESPACE_KUBE = "argocd";
+    private static final String ARGOCD_CONTROL_PLANE_NAMESPACE_OPENSHIFT = "openshift-gitops";
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -47,46 +55,113 @@ class ArgoCDProcessor {
     @BuildStep
     public void customOutputDir(OutputTargetBuildItem outputTarget,
             BuildProducer<ArgoCDOutputDirBuildItem.Effective> outputDirProducer) {
-        getScmRoot(outputTarget)
-                .ifPresent(p -> outputDirProducer.produce(new ArgoCDOutputDirBuildItem.Effective(p.resolve(".argocd"))));
+        getScmRoot(outputTarget).ifPresentOrElse(
+                p -> outputDirProducer.produce(new ArgoCDOutputDirBuildItem.Effective(p.resolve(".argocd"))),
+                () -> outputDirProducer
+                        .produce(new ArgoCDOutputDirBuildItem.Effective(outputTarget.getOutputDirectory().resolve("argocd"))));
     }
 
     @BuildStep
     public void build(ArgoCDConfiguration config,
             ApplicationInfoBuildItem applicationInfo,
             List<FeatureBuildItem> features,
+            EnabledKubernetesDeploymentTargetsBuildItem enabledDeploymentTargets,
             ScmInfoBuildItem scmInfo,
             Optional<CustomHelmOutputDirBuildItem> customHelmOutputDir,
-            BuildProducer<ArgoCDApplicationListBuildItem> applicationListProducer) {
+            BuildProducer<ArgoCDResourceListBuildItem> resourceListProducer) {
 
         if (scmInfo == null) {
             log.warn("No SCM information found. Skipping argocd deployment generation.");
             return;
         }
 
-        String namespace = config.namespace.or(() -> config.project).orElse(null);
+        /**
+         *
+         * The EnabledKubernetesDeploymentTargetsBuildItem returns a list of DeploymentTargetEntry objects which have been
+         * created/produced. they include the target platform: kubernetes, openshift, etc.
+         * We will then control here which one has been enabled in order to set properly the argocd control plane namespace
+         * For openshift, this is openshift-gitops and for kubernetes installation: argocd
+         *
+         */
+        List<DeploymentTargetEntry> entries = enabledDeploymentTargets.getEntriesSortedByPriority();
+        entries.stream().forEach(e -> log.debugf("Deployment target name: %s, strategy: %s", e.getName(),
+                e.getPriority(), e.getDeployStrategy().name()));
+
+        List<DeploymentTargetEntry> openshiftDeploymentTargets = entries.stream().filter(d -> d.getName().equals("openshift"))
+                .collect(Collectors.toList());
+        boolean targetsOpenShift = false;
+        if (!openshiftDeploymentTargets.isEmpty()) {
+            targetsOpenShift = true;
+        }
+
+        /**
+         * Until now Argocd 2.x can only process an AppProject CR created under its control plane's namespace
+         * and by consequence it cannot be created under the namespace of the user or namespace where the Application CR will be
+         * deployed !
+         */
+        String controlPlaneNamespace = targetsOpenShift ? ARGOCD_CONTROL_PLANE_NAMESPACE_OPENSHIFT
+                : ARGOCD_CONTROL_PLANE_NAMESPACE_KUBE;
+
+        /**
+         * The Application CR namespace is by default the same as the Argocd control plane namespace. See the property:
+         * controlPlaneNamespace
+         * If the user configure Argocd to support "Applications in any Namespace", then it can be overridden.
+         */
+        String applicationCustomResourceNamespace = config.application().namespace().orElse(controlPlaneNamespace);
+
         Path helmOutputDir = customHelmOutputDir.map(CustomHelmOutputDirBuildItem::getOutputDir).orElse(Paths.get(".helm"));
+
+        AppProject appProject = null;
+        // If the user specifies as AppProject name "default", then we don't generate the CR as it already exists on the cluster
+        if (Optional.ofNullable(config.appProject())
+                .flatMap(ArgoCDConfiguration.AppProject::name)
+                .filter(name -> name.equals("default"))
+                .isPresent()) {
+            log.warn("The AppProject CR is not generated as the user selected to use the default !");
+        } else {
+            AppProjectBuilder builder = new AppProjectBuilder();
+            // @formatter:off
+            builder.withNewMetadata()
+                .withName(config.appProject().name().orElse(applicationInfo.getName()))
+                .withNamespace(controlPlaneNamespace)
+              .endMetadata()
+              .withNewSpec()
+                .addNewDestination()
+                  .withNamespace(config.destinationNamespace().orElse(null))
+                  .withServer(config.server())
+                .endDestination()
+                .withSourceRepos(scmInfo.getDefaultRemoteUrl())
+              .endSpec();
+
+            if (config.application().namespace().isPresent()) {
+                builder.editOrNewSpec()
+                    .withSourceNamespaces(config.application().namespace().get())
+                    .endSpec();
+            }
+            // @formatter:on
+            appProject = builder.build();
+        }
 
         // @formatter:off
         Application deploy = new ApplicationBuilder()
                 .withNewMetadata()
-                  .withName(applicationInfo.getName() + "-deploy")
-                  .withNamespace(namespace)
+                  .withName(applicationInfo.getName())
+                  .withNamespace(applicationCustomResourceNamespace)
                 .endMetadata()
                 .withNewSpec()
-                  .withProject(config.project.orElse("default"))
+                  .withProject(config.appProject().name().orElse(applicationInfo.getName()))
                   .withNewDestination()
-                    .withServer(config.server)
-                    .withNamespace(namespace)
+                    .withServer(config.server())
+                    .withNamespace(config.destinationNamespace().orElse(null))
                   .endDestination()
                   .withNewSource()
                     .withPath(helmOutputDir.resolve("kubernetes").resolve(applicationInfo.getName()).toString()) //TODO: Get target deployment target.
                     .withRepoURL(scmInfo.getDefaultRemoteUrl())
-                    .withTargetRevision(config.targetRevision)
+                    .withTargetRevision(config.targetRevision())
                     .withNewHelm()
                       .withValueFiles("values.yaml")
-                    .endHelm()
-                  .endSource()
+                     .endApplicationspecHelm()
+                    .endApplicationspecSource()
                   .withNewSyncPolicy()
                     .withNewAutomated()
                       .withPrune(true)
@@ -98,34 +173,39 @@ class ArgoCDProcessor {
                         .withDuration("5s")
                         .withFactor(2L)
                         .withMaxDuration("10m")
-                      .endBackoff()
-                    .endRetry()
+                      .endSyncpolicyBackoff()
+                   .endSyncpolicyRetry()
                   .endSyncPolicy()
                 .endSpec()
                 .build();
         // @formatter:on
-        ApplicationList applicationList = new ApplicationListBuilder()
-                .withItems(List.of(deploy))
-                .build();
 
-        applicationListProducer.produce(new ArgoCDApplicationListBuildItem(applicationList));
+        ArgoCDResourceList<HasMetadata> resourceList = new ArgoCDResourceList<>();
+        resourceList.setItems(appProject != null ? List.of(appProject, deploy) : List.of(deploy));
+        resourceListProducer.produce(new ArgoCDResourceListBuildItem(resourceList));
     }
 
     @BuildStep(onlyIfNot = IsTest.class)
-    public void generateApplicationFileSystemResources(ArgoCDApplicationListBuildItem applicationList,
-            ApplicationInfoBuildItem applicationInfo,
+    public void generateApplicationFileSystemResources(ArgoCDResourceListBuildItem resourceList,
             OutputTargetBuildItem outputTarget,
             Optional<ArgoCDOutputDirBuildItem.Effective> outputDir,
             BuildProducer<GeneratedFileSystemResourceBuildItem> generatedResourceProducer) {
 
+        if (resourceList == null || resourceList.getResourceList() == null) {
+            return;
+        }
+
         outputDir.ifPresent(dir -> {
             Path argocdRoot = dir.getOutputDir();
-            Path applicationDeployPath = argocdRoot.resolve(applicationInfo.getName() + "-deploy.yaml");
 
-            var str = Serialization.asYaml(applicationList);
-            generatedResourceProducer.produce(
-                    new GeneratedFileSystemResourceBuildItem(applicationDeployPath.toAbsolutePath().toString(),
-                            str.getBytes(StandardCharsets.UTF_8)));
+            for (HasMetadata item : resourceList.getResourceList().getItems()) {
+                String kind = item.getKind().toLowerCase();
+                String name = item.getMetadata().getName();
+                Path path = argocdRoot.resolve(kind + "-" + name + ".yaml");
+                var str = Serialization.asYaml(item);
+                generatedResourceProducer.produce(new GeneratedFileSystemResourceBuildItem(path.toAbsolutePath().toString(),
+                        str.getBytes(StandardCharsets.UTF_8)));
+            }
         });
     }
 

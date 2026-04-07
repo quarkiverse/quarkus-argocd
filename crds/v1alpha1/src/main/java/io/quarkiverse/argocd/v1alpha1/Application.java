@@ -20,8 +20,30 @@ public class Application extends
         io.fabric8.kubernetes.client.CustomResource<io.quarkiverse.argocd.v1alpha1.ApplicationSpec, io.quarkiverse.argocd.v1alpha1.ApplicationStatus>
         implements io.fabric8.kubernetes.api.model.Namespaced, io.fabric8.kubernetes.api.builder.Editable<ApplicationBuilder> {
 
+    @java.lang.Override()
+    @io.fabric8.generator.annotation.Required()
+    public io.quarkiverse.argocd.v1alpha1.ApplicationSpec getSpec() {
+        return super.getSpec();
+    }
+
     @java.lang.Override
     public ApplicationBuilder edit() {
         return new ApplicationBuilder(this);
+    }
+
+    /**
+     * Operation contains information about a requested or running operation
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("operation")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Operation contains information about a requested or running operation")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private io.quarkiverse.argocd.v1alpha1.application.Operation operation;
+
+    public io.quarkiverse.argocd.v1alpha1.application.Operation getOperation() {
+        return operation;
+    }
+
+    public void setOperation(io.quarkiverse.argocd.v1alpha1.application.Operation operation) {
+        this.operation = operation;
     }
 }

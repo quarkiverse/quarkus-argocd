@@ -25,6 +25,14 @@
         <version>${quarkus-helm.version}</version>
       </dependency>
       <dependency>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-kubernetes-client</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-kubernetes-client-deployment</artifactId>
+      </dependency>
+      <dependency>
         <groupId>com.fasterxml.jackson.dataformat</groupId>
         <artifactId>jackson-dataformat-yaml</artifactId>
       </dependency>
