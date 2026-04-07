@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.quarkiverse</groupId>
         <artifactId>quarkiverse-parent</artifactId>
-        <version>16</version>
+        <version>18</version>
     </parent>
     <groupId>io.quarkiverse.argocd</groupId>
     <artifactId>quarkus-argocd-parent</artifactId>
@@ -21,25 +21,26 @@
         <module>deployment</module>
         <module>runtime</module>
         <module>cli</module>
-        <module>docs</module>
     </modules>
 
     <scm>
         <connection>scm:git:git@github.com:quarkiverse/quarkus-argocd.git</connection>
         <developerConnection>scm:git:git@github.com:quarkiverse/quarkus-argocd.git</developerConnection>
         <url>https://github.com/quarkiverse/quarkus-argocd</url>
-    </scm>
+      <tag>HEAD</tag>
+  </scm>
 
     <properties>
         <compiler-plugin.version>3.13.0</compiler-plugin.version>
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <quarkus.version>3.15.1</quarkus.version>
+        <quarkus.version>3.19.2</quarkus.version>
+        <!-- <quarkus.version>999-SNAPSHOT</quarkus.version> -->
         <sundrio.version>0.103.1</sundrio.version>
-        <lombok.version>1.18.26</lombok.version>
-        <kubernetes-client.version>6.13.1</kubernetes-client.version>
-        <quarkus-jgit.version>3.1.2</quarkus-jgit.version>
+        <lombok.version>1.18.30</lombok.version>
+        <kubernetes-client.version>7.1.0</kubernetes-client.version>
+        <quarkus-jgit.version>3.3.3</quarkus-jgit.version>
         <quarkus-helm.version>1.2.4</quarkus-helm.version>
         <surefire-plugin.version>3.2.5</surefire-plugin.version>
         <!-- Formatting Plugins -->
@@ -75,6 +76,11 @@
                             <arg>-parameters</arg>
                         </compilerArgs>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-config-doc-maven-plugin</artifactId>
+                    <version>${quarkus.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
