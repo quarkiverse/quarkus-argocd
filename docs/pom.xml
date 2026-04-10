@@ -22,7 +22,7 @@
         <dependency>
             <groupId>io.quarkiverse.antora</groupId>
             <artifactId>quarkus-antora</artifactId>
-            <version>1.1.0</version>
+            <version>3.25.0</version>
         </dependency>
     </dependencies>
 
