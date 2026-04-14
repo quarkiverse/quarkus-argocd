@@ -59,6 +59,7 @@
       <artifactId>lombok</artifactId>
       <version>${lombok.version}</version>
     </dependency>
+    <!-- Override the f8 kubernetes client version to use the same as dekorate instead the one coming from quarkus kubernetes client -->
     <dependency>
       <groupId>io.fabric8</groupId>
       <artifactId>kubernetes-client-api</artifactId>
