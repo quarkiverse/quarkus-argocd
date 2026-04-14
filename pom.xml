@@ -42,7 +42,7 @@
         <kubernetes-client.version>7.6.1</kubernetes-client.version>
         <!-- Moving quarkus jgit from 3.3.3 to 3.6.2 requires also to bump the quarkus version to 3.20.1 at least: https://github.com/quarkusio/quarkus/pull/47137 -->
         <quarkus-jgit.version>3.6.2</quarkus-jgit.version>
-        <quarkus-helm.version>1.3.0</quarkus-helm.version>
+        <quarkus-helm.version>1.4.0</quarkus-helm.version>
 
         <!-- Maven plugins -->
         <gpg-maven-plugin.version>3.2.8</gpg-maven-plugin.version>
