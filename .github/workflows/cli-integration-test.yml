@@ -70,11 +70,11 @@ jobs:
           shopt -s expand_aliases
           alias quarkus="java -jar ${GITHUB_WORKSPACE}/quarkus-cli.jar"
           
-          echo "## Create a Quarkus project"
+          echo "## Create a Quarkus project using the version: $QUARKUS_CLI_VERSION"
 
           TMP_DIR=$(mktemp -d)
           pushd $TMP_DIR
-          quarkus create app
+          quarkus create app -P $QUARKUS_CLI_VERSION
           cd code-with-quarkus
           
           echo "## Init a git repository and push the code"
