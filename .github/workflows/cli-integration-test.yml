@@ -32,7 +32,7 @@ defaults:
     shell: bash
 
 env:
-  QUARKUS_CLI_VERSION: 3.20.1
+  QUARKUS_CLI_VERSION: 3.33.3
 
 jobs:
   build:
@@ -45,11 +45,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
           cache: 'maven'
 
       - name: Build with Maven
@@ -65,6 +65,9 @@ jobs:
           java -jar quarkus-cli.jar version
 
       - name: Create a quarkus project and generate the Argo CD yaml file
+        env:
+          # Increases thread stack size to 4 Megabytes as we got a stackoverflow exception
+          JAVA_TOOL_OPTIONS: "-Xss4m"
         run: |
           echo "## Create a quarkus alias"
           shopt -s expand_aliases
