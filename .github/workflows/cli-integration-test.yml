@@ -76,15 +76,11 @@ jobs:
           # Increases thread stack size to 4 Megabytes as we got a stackoverflow exception
           JAVA_TOOL_OPTIONS: "-Xss4m"
         run: |
-          echo "## Create a quarkus alias"
-          shopt -s expand_aliases
-          alias quarkus="java -jar ${GITHUB_WORKSPACE}/quarkus-cli.jar"
-          
-          echo "## Create a Quarkus project using the version: $QUARKUS_CLI_VERSION"
+          echo "## Create a Quarkus project using the version: $QUARKUS_VERSION"
 
           TMP_DIR=$(mktemp -d)
           pushd $TMP_DIR
-          quarkus create app -P $QUARKUS_CLI_VERSION
+          quarkus create app -P $QUARKUS_VERSION
           cd code-with-quarkus
           
           echo "## Init a git repository and push the code"
