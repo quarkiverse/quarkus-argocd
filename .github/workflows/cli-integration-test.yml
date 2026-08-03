@@ -65,6 +65,9 @@ jobs:
           java -jar quarkus-cli.jar version
 
       - name: Create a quarkus project and generate the Argo CD yaml file
+        env:
+          # Increases thread stack size to 4 Megabytes as we got a stackoverflow exception
+          JAVA_TOOL_OPTIONS: "-Xss4m"
         run: |
           echo "## Create a quarkus alias"
           shopt -s expand_aliases
