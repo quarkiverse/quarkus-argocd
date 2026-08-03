@@ -31,9 +31,6 @@ defaults:
   run:
     shell: bash
 
-env:
-  QUARKUS_CLI_VERSION: 3.33.3
-
 jobs:
   build:
     name: Build on ${{ matrix.os }}
@@ -58,11 +55,15 @@ jobs:
       - name: Execute the IT test using kind container
         run: mvn test -Dtest=ArgocdExtensionDevModeIT -Dsurefire.failIfNoSpecifiedTests=false
 
+      - name: Extract Quarkus Version from POM
+        run: |
+          QUARKUS_VERSION=$(mvn help:evaluate -Dexpression=quarkus.version -q -DforceStdout)
+          echo "QUARKUS_VERSION=$QUARKUS_VERSION" >> $GITHUB_ENV
+
       - name: Install Quarkus CLI and register the plugin
         run: |
-          echo "## Install quarkus CLI"
-          curl -sL https://repo.maven.apache.org/maven2/io/quarkus/quarkus-cli/$QUARKUS_CLI_VERSION/quarkus-cli-$QUARKUS_CLI_VERSION-runner.jar -o quarkus-cli.jar
-          java -jar quarkus-cli.jar version
+          echo "## Install quarkus CLI - version: ${{ env.QUARKUS_VERSION }}"
+          jbang app install --name quarkus --force io.quarkus:quarkus-cli:${{ env.QUARKUS_VERSION }}
 
       - name: Create a quarkus project and generate the Argo CD yaml file
         env:
