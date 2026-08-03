@@ -49,6 +49,12 @@ jobs:
           java-version: 21
           cache: 'maven'
 
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@v0.1.1
+
+      - name: Verify JBang installation
+        run: jbang --version
+
       - name: Build with Maven
         run: mvn -B clean install -Dno-format -Dquarkus.ingress.devservices.port-forward-enabled=false
 
