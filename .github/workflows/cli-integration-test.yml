@@ -69,7 +69,7 @@ jobs:
       - name: Install Quarkus CLI and register the plugin
         run: |
           echo "## Install quarkus CLI - version: ${{ env.QUARKUS_VERSION }}"
-          jbang app install --name quarkus --force -m io.quarkus.cli.Main io.quarkus:quarkus-cli:${{ env.QUARKUS_VERSION }}
+          jbang app install --name quarkus --force io.quarkus:quarkus-cli:${{ env.QUARKUS_VERSION }}:runner
 
       - name: Create a quarkus project and generate the Argo CD yaml file
         env:
