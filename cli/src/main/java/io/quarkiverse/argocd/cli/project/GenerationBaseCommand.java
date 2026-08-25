@@ -17,6 +17,7 @@ import io.quarkiverse.argocd.cli.handlers.GetArgoCDApplicationHandler;
 import io.quarkiverse.argocd.cli.utils.Git;
 import io.quarkiverse.argocd.spi.ArgoCDResourceListBuildItem;
 import io.quarkiverse.argocd.v1alpha1.ArgoCDResourceList;
+import io.quarkus.bootstrap.BootstrapAppModelFactory;
 import io.quarkus.bootstrap.BootstrapException;
 import io.quarkus.bootstrap.app.AugmentAction;
 import io.quarkus.bootstrap.app.CuratedApplication;
@@ -24,6 +25,7 @@ import io.quarkus.bootstrap.app.QuarkusBootstrap;
 import io.quarkus.devtools.project.BuildTool;
 import io.quarkus.devtools.project.QuarkusProjectHelper;
 import io.quarkus.maven.dependency.ArtifactDependency;
+import io.quarkus.maven.dependency.Dependency;
 import picocli.CommandLine.ExitCode;
 import picocli.CommandLine.Option;
 
@@ -61,6 +63,35 @@ public abstract class GenerationBaseCommand extends ProjectBaseCommand implement
         return buildSystemProperties;
     }
 
+    /**
+     * Force quarkus-argocd only when the project does not already depend on it.
+     * If the extension is already present, the existing version is used to avoid conflicts.
+     */
+    List<Dependency> getForcedDependencies() {
+        try {
+            Optional<String> existingVersion = BootstrapAppModelFactory.newInstance()
+                    .setProjectRoot(getWorkingDirectory())
+                    .setLocalProjectsDiscovery(true)
+                    .resolveAppModel()
+                    .getApplicationModel()
+                    .getDependencies().stream()
+                    .filter(d -> QUARKUS_ARGOCD.getGroupId().equals(d.getGroupId())
+                            && QUARKUS_ARGOCD.getArtifactId().equals(d.getArtifactId()))
+                    .map(Dependency::getVersion)
+                    .findFirst();
+            if (existingVersion.isPresent()) {
+                if (!existingVersion.get().equals(QUARKUS_ARGOCD.getVersion())) {
+                    System.out.println("Using quarkus-argocd version " + existingVersion.get()
+                            + " already present in the project (CLI version is " + QUARKUS_ARGOCD.getVersion() + ").");
+                }
+                return List.of();
+            }
+        } catch (Exception e) {
+            // Model resolution is not supported for all build tools (e.g. gradle), fallback to forcing the dependency.
+        }
+        return List.of(QUARKUS_ARGOCD);
+    }
+
     public Integer call() {
         Path projectRoot = getWorkingDirectory();
 
@@ -93,7 +124,7 @@ public abstract class GenerationBaseCommand extends ProjectBaseCommand implement
                 .setRebuild(true)
                 .setLocalProjectDiscovery(true)
                 .setBaseClassLoader(ClassLoader.getSystemClassLoader())
-                .setForcedDependencies(List.of(QUARKUS_ARGOCD))
+                .setForcedDependencies(getForcedDependencies())
                 .setDependencyInfoProvider(null)
                 .build();
 
