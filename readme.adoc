@@ -16,6 +16,65 @@ Generate Argo CD Application or Project as part of the Quarkus build or using th
 - Project added under a version control system and pushed on a repository (e.g. GitHub, etc.)
 - A Kubernetes cluster with Argo CD https://argo-cd.readthedocs.io/en/stable/getting_started/#1-install-argo-cd[installed] and https://argo-cd.readthedocs.io/en/stable/user-guide/application-specification/[supporting] `argoproj.io/v1alpha1`.
 
+== Compatibility
+
+The following table lists, for each release of the extension, the main versions it was built with:
+
+[cols="1,1,1,1",options="header"]
+|===
+| Quarkus ArgoCD | Quarkus | Fabric8 Kubernetes Client | Sundrio
+
+| `999-SNAPSHOT` (next release) | 3.33.3 | 8.0.0 | 0.400.1
+| 0.5.0 | 3.33.3 | 7.7.0 | 0.103.1
+| 0.4.0 | 3.20.1 | 7.6.1 | 0.103.1
+| 0.3.0 | 3.19.2 | 7.1.0 | 0.103.1
+| 0.2.0 | 3.18.1 | 7.1.0 | 0.103.1
+| 0.1.0 | 3.17.3 | 6.13.1 | 0.103.1
+| 0.0.1 - 0.0.3 | 3.14.4 | 6.13.1 | 0.103.1
+|===
+
+=== Breaking changes in the next release (after 0.5.0)
+
+The Argo CD model (`io.quarkiverse.argocd.v1alpha1.*`) is generated with https://github.com/sundrio/sundrio[Sundrio].
+The upgrade of Sundrio from `0.103.1` to `0.400.1` (https://github.com/quarkiverse/quarkus-argocd/pull/153[#153]) changed the names of the `end*()` methods of the nested builders: they are no longer prefixed with the name of the parent type.
+
+This only affects code that uses the generated model builders directly (e.g. `ApplicationBuilder`).
+The extension configuration (`quarkus.argocd.*`), the CLI and the generated resources are unchanged.
+
+[cols="1,1",options="header"]
+|===
+| Before (0.5.0 and older) | After
+
+| `endApplicationspecSource()` | `endSource()`
+| `endApplicationspecHelm()` | `endHelm()`
+| `endSyncpolicyRetry()` | `endRetry()`
+| `endSyncpolicyBackoff()` | `endBackoff()`
+|===
+
+The other nested builders of the model whose `end*()` method was prefixed follow the same pattern: remove the parent type prefix from the method name.
+
+Example:
+
+[source,java]
+----
+new ApplicationBuilder()
+    .withNewSpec()
+        .withNewSource()
+            .withNewHelm()
+                .withValueFiles("values.yaml")
+            .endHelm()        // was: endApplicationspecHelm()
+        .endSource()          // was: endApplicationspecSource()
+        .withNewSyncPolicy()
+            .withNewRetry()
+                .withNewBackoff()
+                    .withDuration("5s")
+                .endBackoff() // was: endSyncpolicyBackoff()
+            .endRetry()       // was: endSyncpolicyRetry()
+        .endSyncPolicy()
+    .endSpec()
+    .build();
+----
+
 == Building
 
 To build the extension use the following command:
