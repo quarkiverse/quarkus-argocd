@@ -53,6 +53,10 @@ public abstract class GenerationBaseCommand extends ProjectBaseCommand implement
     @Option(names = { "-p", "--project-name" }, description = "The project name")
     Optional<String> project = Optional.empty();
 
+    @Option(names = {
+            "--target-revision" }, description = "The revision of the Git repository (branch, tag or commit) that Argo CD should sync. Default value is: HEAD")
+    Optional<String> targetRevision = Optional.empty();
+
     public Properties getBuildSystemProperties() {
         Properties buildSystemProperties = new Properties();
         kubernetesApiUrl.ifPresent(v -> buildSystemProperties.put("quarkus.argocd.server", v));
@@ -60,6 +64,7 @@ public abstract class GenerationBaseCommand extends ProjectBaseCommand implement
         appProjectNamespace.ifPresent(v -> buildSystemProperties.setProperty("quarkus.argocd.app-project.namespace", v));
         applicationNamespace.ifPresent(v -> buildSystemProperties.setProperty("quarkus.argocd.application.namespace", v));
         project.ifPresent(v -> buildSystemProperties.setProperty("quarkus.argocd.app-project.name", v));
+        targetRevision.ifPresent(v -> buildSystemProperties.setProperty("quarkus.argocd.target-revision", v));
         return buildSystemProperties;
     }
 
