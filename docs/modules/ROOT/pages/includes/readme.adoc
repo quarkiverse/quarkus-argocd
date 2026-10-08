@@ -97,7 +97,7 @@ To add the extension to the project, manually edit the `pom.xml` or `build.gradl
 <dependency>
     <groupId>io.quarkiverse.argocd</groupId>
     <artifactId>quarkus-argocd</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.5.0</version>
 </dependency>
 ```
 
@@ -105,11 +105,90 @@ To add the extension to the project, manually edit the `pom.xml` or `build.gradl
 
 ```groovy
 dependencies {
-    implementation 'io.quarkiverse.argocd:quarkus-argocd:999-SNAPSHOT'
+    implementation 'io.quarkiverse.argocd:quarkus-argocd:0.5.0'
 }
 ```
 
 After this step the Argo CD yaml files will be generated under the `.argocd` directory within the project root as part of the build.
+
+=== Generated resources
+
+The extension generates, under the `.argocd` directory of the Git repository root, one file per resource:
+
+- `appproject-<project-name>.yaml`: the `AppProject`. It is not generated when `quarkus.argocd.app-project.name` is set to `default`, as this project already exists in Argo CD.
+- `application-<application-name>.yaml`: the `Application`.
+
+NOTE: Nothing is generated when the project is not in a Git repository with a remote, as the repository URL is required.
+
+Example of an `Application` generated for a project named `my-app`:
+
+[source,yaml]
+----
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-app
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+  project: my-app
+  source:
+    helm:
+      valueFiles:
+      - values.yaml
+    path: .helm/kubernetes/my-app
+    repoURL: https://github.com/<owner>/<repository>.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    retry:
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 10m
+    syncOptions:
+    - CreateNamespace=true
+    - RespectIgnoreDifferences=true
+    - ApplyOutOfSyncOnly=true
+----
+
+The values are computed as follows:
+
+[cols="1,2",options="header"]
+|===
+| Field | Value
+
+| `metadata.namespace`
+| `quarkus.argocd.application.namespace`, or the Argo CD control plane namespace: `argocd`, or `openshift-gitops` when the OpenShift deployment target is enabled
+
+| `spec.project`
+| `quarkus.argocd.app-project.name`, or the application name
+
+| `spec.destination`
+| `quarkus.argocd.server` and `quarkus.argocd.destination-namespace`
+
+| `spec.source.repoURL`
+| The URL of the Git remote of the project
+
+| `spec.source.targetRevision`
+| `quarkus.argocd.target-revision` (default: `HEAD`)
+
+| `spec.source.path`
+| The Helm chart generated for the application. See <<helm-integration>>
+|===
+
+The `AppProject` is created in the Argo CD control plane namespace and allows the same destination and the Git repository of the project as source.
+When `quarkus.argocd.application.namespace` is set, this namespace is also added to its `sourceNamespaces`.
+
+[[helm-integration]]
+=== Integration with Quarkus Helm
+
+The extension depends on https://docs.quarkiverse.io/quarkus-helm/dev/index.html[Quarkus Helm], which generates a Helm chart for the application from the Kubernetes resources produced by the Quarkus Kubernetes extensions.
+
+The generated `Application` deploys this chart with its `values.yaml` file. Its `spec.source.path` is `.helm/kubernetes/<application-name>`, relative to the Git repository root, so the chart must be available at this location in the repository synced by Argo CD.
 
 === Using the CLI
 
@@ -117,7 +196,7 @@ The project provides a companion CLI that can be used to generate, install / uni
 The CLI can be added with the following command:
 
 ```shell
-quarkus plug add io.quarkiverse.argocd:quarkus-argocd-cli:999-SNAPSHOT
+quarkus plug add io.quarkiverse.argocd:quarkus-argocd-cli:0.5.0
 ```
 
 ==== Regenerating the files:
@@ -128,7 +207,7 @@ To re-trigger the file generation:
 quarkus argocd project generate
 ```
 
-**Note**: Several parameters can be used to configure the generated CR. Use `quarkus argocd generate -h` to display the usage.
+**Note**: Several parameters can be used to configure the generated CR. Use `quarkus argocd project generate -h` to display the usage.
 
 To install the generated `Application` and `AppProject` (optional) custom resources to the currently connected Kubernetes cluster:
 
@@ -138,7 +217,7 @@ quarkus argocd project install
 *Note*: In case of un-committed or un-pushed changes the command will prompt users to decide if they want to proceed with the installation.
 
 The `currently connected Kubernetes cluster` is the one that is configured in the `~/.kube/config` file.
-It can be overridden by setting in `applcation.properties` a different API server URL and token. See the `quarkus-kubernetes-client` extension for more details.
+It can be overridden by setting in `application.properties` a different API server URL and token. See the `quarkus-kubernetes-client` extension for more details.
 
 To uninstall:
 
@@ -153,3 +232,66 @@ To list all Applications installed
 ```shell
 quarkus argocd project list
 ```
+
+==== CLI options
+
+The `generate`, `install` and `uninstall` commands accept the following options. Each of them overrides the corresponding configuration property of the extension:
+
+[cols="1,1,2",options="header"]
+|===
+| Option | Property | Description
+
+| `--server`
+| `quarkus.argocd.server`
+| The Kubernetes API Server URL
+
+| `--appproject-namespace`
+| `quarkus.argocd.app-project.namespace`
+| The Argo CD control plane namespace where the `AppProject` is installed
+
+| `--application-namespace`
+| `quarkus.argocd.application.namespace`
+| The namespace where the `Application` is installed
+
+| `--destination-namespace`
+| `quarkus.argocd.destination-namespace`
+| The namespace where the resources of the application are deployed
+
+| `-p`, `--project-name`
+| `quarkus.argocd.app-project.name`
+| The name of the `AppProject`
+
+| `--target-revision`
+| `quarkus.argocd.target-revision`
+| The revision of the Git repository (branch, tag or commit) that Argo CD syncs
+|===
+
+Example:
+
+```shell
+quarkus argocd project generate --destination-namespace=my-app --target-revision=develop
+```
+
+== Dev Services
+
+In dev and test mode, the extension starts a Kubernetes cluster with https://quarkus.io/guides/kubernetes-dev-services[Kubernetes Dev Services] and installs Argo CD on it.
+A container runtime (Docker or Podman) is required.
+
+The Dev Service:
+
+- starts a cluster of type `quarkus.argocd.devservices.cluster-type` (default: `kind`)
+- installs the NGINX ingress controller
+- installs Argo CD `quarkus.argocd.devservices.version` (default: `v2.13.2`) in the `quarkus.argocd.devservices.control-plane-namespace` namespace (default: `argocd`), without the Dex and notifications components
+- creates an ingress for the Argo CD server using the host `quarkus.argocd.devservices.host-name` (default: `argocd.localtest.me`)
+- forwards the Argo CD server port to `quarkus.argocd.devservices.host-port` (default: `8443`) on the host, unless `quarkus.argocd.devservices.ingress.port-forward-enabled` is `false`
+
+The Argo CD UI can be accessed with the user `admin`. Its password is printed in the application logs and a link to the dashboard is available in the Dev UI.
+
+To disable the Dev Service:
+
+[source,properties]
+----
+quarkus.argocd.devservices.enabled=false
+----
+
+See the `quarkus.argocd.devservices.*` properties in the configuration reference for all the options.
