@@ -13,6 +13,7 @@ import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 import io.dekorate.utils.Strings;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.quarkiverse.argocd.cli.handlers.GetArgoCDApplicationHandler;
 import io.quarkiverse.argocd.cli.utils.Git;
 import io.quarkiverse.argocd.spi.ArgoCDResourceListBuildItem;
@@ -148,6 +149,11 @@ public abstract class GenerationBaseCommand extends ProjectBaseCommand implement
                         return;
                     }
 
+                    if (dryRun) {
+                        printDryRun(resourceList);
+                        return;
+                    }
+
                     process(resourceList);
 
                 }
@@ -160,6 +166,14 @@ public abstract class GenerationBaseCommand extends ProjectBaseCommand implement
     }
 
     abstract void process(ArgoCDResourceList<?> resourceList);
+
+    private void printDryRun(ArgoCDResourceList<?> resourceList) {
+        System.out.println("Dry run: the '" + spec.name() + "' command would process the following ArgoCD resources:");
+        for (HasMetadata item : resourceList.getItems()) {
+            System.out.println("  " + item.getKind() + " " + item.getMetadata().getNamespace() + "/"
+                    + item.getMetadata().getName());
+        }
+    }
 
     protected void writeStringSafe(Path p, String content) {
         try {
