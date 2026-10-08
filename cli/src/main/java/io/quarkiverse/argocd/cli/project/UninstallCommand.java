@@ -26,32 +26,43 @@ public class UninstallCommand extends GenerationBaseCommand {
         List<ProjectListItem> projectItems = new ArrayList<>();
         KubernetesClient kubernetesClient = new KubernetesClientBuilder().build();
 
-        for (AppProject project : resourceList.getAppProjectList().getItems()) {
-            String projectName = project.getMetadata().getName();
-            List<ApplicationListItem> applicationItems = new ArrayList<>();
+        // If the list of the resource don't include an AppProject, this is because the user is using the default project one
+        if (resourceList.getAppProjectList().getItems().isEmpty()) {
+            List<ApplicationListItem> applicationItems = deleteApplications(kubernetesClient, resourceList, "default");
+            projectItems.add(new ProjectListItem("default", applicationItems));
+        } else {
+            for (AppProject project : resourceList.getAppProjectList().getItems()) {
+                String projectName = project.getMetadata().getName();
+                List<ApplicationListItem> applicationItems = deleteApplications(kubernetesClient, resourceList, projectName);
 
-            for (Application application : resourceList.getApplicationList().getItems()) {
-                if (!projectName.equals(application.getSpec().getProject())) {
-                    continue;
-                }
-                kubernetesClient.resources(Application.class)
-                        .inNamespace(application.getMetadata().getNamespace())
-                        .withName(application.getMetadata().getName())
+                kubernetesClient.resources(AppProject.class)
+                        .inNamespace(project.getMetadata().getNamespace())
+                        .withName(project.getMetadata().getName())
                         .delete();
 
-                applicationItems.add(ApplicationListItem.from(application));
+                projectItems.add(new ProjectListItem(projectName, applicationItems));
             }
-
-            kubernetesClient.resources(AppProject.class)
-                    .inNamespace(project.getMetadata().getNamespace())
-                    .withName(project.getMetadata().getName())
-                    .delete();
-
-            projectItems.add(new ProjectListItem(projectName, applicationItems));
         }
 
         System.out.println("Uninstalled ArgoCD applications:");
         ProjectListTable table = new ProjectListTable(projectItems);
         System.out.println(table.getContent());
+    }
+
+    private static List<ApplicationListItem> deleteApplications(KubernetesClient kubernetesClient,
+            ArgoCDResourceList<?> resourceList, String projectName) {
+        List<ApplicationListItem> applicationItems = new ArrayList<>();
+        for (Application application : resourceList.getApplicationList().getItems()) {
+            if (!projectName.equals(application.getSpec().getProject())) {
+                continue;
+            }
+            kubernetesClient.resources(Application.class)
+                    .inNamespace(application.getMetadata().getNamespace())
+                    .withName(application.getMetadata().getName())
+                    .delete();
+
+            applicationItems.add(ApplicationListItem.from(application));
+        }
+        return applicationItems;
     }
 }
