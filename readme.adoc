@@ -130,6 +130,12 @@ quarkus argocd project generate
 
 **Note**: Several parameters can be used to configure the generated CR. Use `quarkus argocd generate -h` to display the usage.
 
+The `generate`, `install` and `uninstall` commands also accept `--dry-run`, which lists the Argo CD resources that would be processed without writing any file or changing the cluster:
+
+```shell
+quarkus argocd project install --dry-run
+```
+
 To install the generated `Application` and `AppProject` (optional) custom resources to the currently connected Kubernetes cluster:
 
 ```shell
