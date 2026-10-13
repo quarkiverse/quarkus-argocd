@@ -22,6 +22,7 @@ import org.eclipse.jgit.transport.SshSessionFactory;
 import org.eclipse.jgit.transport.SshTransport;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.transport.ssh.jsch.JschConfigSessionFactory;
+import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.microprofile.config.ConfigProvider;
 
 public final class Git {
@@ -113,6 +114,29 @@ public final class Git {
                 }
                 return false;
             } catch (IOException | GitAPIException e) {
+                return false;
+            }
+        }).orElse(false);
+    }
+
+    /**
+     * Checks if a path, relative to the SCM root, is committed in the HEAD of the Git repository.
+     *
+     * @param path The path relative to the SCM root.
+     * @return true if the path is part of the HEAD commit, false otherwise.
+     */
+    public static boolean isPathCommitted(String path) {
+        return getScmRoot().map(root -> {
+            try (org.eclipse.jgit.api.Git git = org.eclipse.jgit.api.Git.open(root.toFile())) {
+                Repository repository = git.getRepository();
+                ObjectId head = repository.resolve("HEAD^{tree}");
+                if (head == null) {
+                    return false;
+                }
+                try (TreeWalk treeWalk = TreeWalk.forPath(repository, path, head)) {
+                    return treeWalk != null;
+                }
+            } catch (IOException e) {
                 return false;
             }
         }).orElse(false);

@@ -38,6 +38,14 @@ public class InstallCommand extends GenerationBaseCommand {
             if (shouldAbort(repoURL)) {
                 return;
             }
+
+            // Argo CD syncs the path from the remote repository, so the files must be committed (e.g. not generated under target/)
+            String path = application.getSpec().getSource().getPath();
+            if (path != null && !Git.isPathCommitted(path) && !Prompt.yesOrNo(false,
+                    "The path: " + path + " of the Application: " + application.getMetadata().getName()
+                            + " is not committed in the git repository. Do you still want to proceed (y/N)?")) {
+                return;
+            }
         }
 
         // If the list of the resource don't include an AppProject, this is because the user is using the default project one

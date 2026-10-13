@@ -102,6 +102,9 @@ public class ArgoCDProcessor {
         String controlPlaneNamespace = targetsOpenShift ? ARGOCD_CONTROL_PLANE_NAMESPACE_OPENSHIFT
                 : ARGOCD_CONTROL_PLANE_NAMESPACE_KUBE;
 
+        // Quarkus Helm generates a chart per deployment target under: <helm output dir>/<deployment target>/<application name>
+        String deploymentTarget = targetsOpenShift ? "openshift" : "kubernetes";
+
         /**
          * The Application CR namespace is by default the same as the Argocd control plane namespace. See the property:
          * controlPlaneNamespace
@@ -155,7 +158,7 @@ public class ArgoCDProcessor {
                     .withNamespace(config.destinationNamespace().orElse(null))
                   .endDestination()
                   .withNewSource()
-                    .withPath(helmOutputDir.resolve("kubernetes").resolve(applicationInfo.getName()).toString()) //TODO: Get target deployment target.
+                    .withPath(helmOutputDir.resolve(deploymentTarget).resolve(applicationInfo.getName()).toString())
                     .withRepoURL(scmInfo.getDefaultRemoteUrl())
                     .withTargetRevision(config.targetRevision())
                     .withNewHelm()
