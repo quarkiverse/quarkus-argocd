@@ -23,19 +23,22 @@ public class ArgocdDevUIProcessor {
             CardPageBuildItem card = new CardPageBuildItem();
             LOG.debug("Creating card page");
 
-            String url = String.format("https://%s:%s", i.host(), i.hostPort());
-            LOG.debug("Creating an external link page for: argocd UI");
-            card.addPage(Page.externalPageBuilder("Argocd Dashboard")
-                    .doNotEmbed()
-                    .icon("font-awesome-solid:code-branch")
-                    .url(url));
+            // The Argo CD server runs without TLS and is only reachable from the host through the port forward
+            if (i.portForwardEnabled()) {
+                String url = String.format("http://%s:%s", i.host(), i.hostPort());
+                LOG.debug("Creating an external link page for: argocd UI");
+                card.addPage(Page.externalPageBuilder("Argocd Dashboard")
+                        .doNotEmbed()
+                        .icon("font-awesome-solid:code-branch")
+                        .url(url));
+            }
 
             LOG.debug("Creating an external link page for: argocd project & version");
             final ExternalPageBuilder versionPage = Page.externalPageBuilder("Argocd project")
                     .icon("font-awesome-solid:tag")
                     .url("https://argo-cd.readthedocs.io/en/stable/")
                     .doNotEmbed()
-                    .staticLabel("2.13.2");
+                    .staticLabel(i.version());
 
             LOG.debug("Add version page");
             card.addPage(versionPage);

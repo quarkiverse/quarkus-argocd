@@ -230,6 +230,8 @@ public class ArgocdExtensionProcessor {
                 new ArgocdDevServiceInfoBuildItem(
                         argoConfig.hostName(),
                         Integer.parseInt(argoConfig.hostPort()),
+                        argoConfig.ingress().portForwardEnabled(),
+                        argoConfig.version(),
                         "admin",
                         argocd_admin_password));
 
