@@ -49,7 +49,7 @@ public interface ArgocdDevServiceConfig {
     long timeOut();
 
     /**
-     * The cluster type to be used: kind or k3
+     * The cluster type to be used: kind or k3s
      * The default value is: kind
      */
     @WithDefault("kind")

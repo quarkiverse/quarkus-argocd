@@ -96,30 +96,37 @@ public class ArgocdExtensionProcessor {
         Utils.setConfig(argoConfig);
         Utils.setKubernetesClient(client);
 
-        // TODO: To be removed when the issue https://github.com/dajudge/kindcontainer/issues/363 is fixed and released in 1.4.9
-        // Patch the node created to add the ingress label
-        // ingress-ready: "true"
-        LOG.info("Patching the node's label to add: ingress-ready: true");
-        client.nodes().withName("kind").edit(
-                n -> new NodeBuilder(n).editMetadata().addToLabels("ingress-ready", "true").endMetadata().build());
+        // The ingress-nginx manifest installed is the kind specific one. Other clusters (e.g. k3s) bundle their own ingress controller
+        if ("kind".equals(argoConfig.clusterType())) {
+            // TODO: To be removed when the issue https://github.com/dajudge/kindcontainer/issues/363 is fixed and released in 1.4.9
+            // Patch the node created to add the ingress label
+            // ingress-ready: "true"
+            LOG.info("Patching the node's label to add: ingress-ready: true");
+            client.nodes().withName("kind").edit(
+                    n -> new NodeBuilder(n).editMetadata().addToLabels("ingress-ready", "true").endMetadata().build());
 
-        // Install the ingress controller
-        List<HasMetadata> items = client.load(Utils.fetchIngressResourcesFromURL(argoConfig.ingress().version())).items();
-        LOG.info("Deploying the ingress controller resources ...");
-        for (HasMetadata item : items) {
-            var res = client.resource(item).create();
-            assertNotNull(res);
+            // Install the ingress controller
+            List<HasMetadata> ingressItems = client.load(Utils.fetchIngressResourcesFromURL(argoConfig.ingress().version()))
+                    .items();
+            LOG.info("Deploying the ingress controller resources ...");
+            for (HasMetadata item : ingressItems) {
+                var res = client.resource(item).create();
+                assertNotNull(res);
+            }
+
+            waitTillPodSelectedByLabelsIsReady(
+                    Map.of(
+                            "app.kubernetes.io/name", "ingress-nginx",
+                            "app.kubernetes.io/component", "controller"),
+                    "ingress-nginx");
+        } else {
+            LOG.infof("Skipping the installation of the ingress-nginx controller for the cluster type: %s",
+                    argoConfig.clusterType());
         }
-
-        waitTillPodSelectedByLabelsIsReady(
-                Map.of(
-                        "app.kubernetes.io/name", "ingress-nginx",
-                        "app.kubernetes.io/component", "controller"),
-                "ingress-nginx");
 
         var ARGOCD_CONTROLLER_NAMESPACE = argoConfig.controlPlaneNamespace();
         // Install the Argocd resources from the YAML manifest file
-        items = client.load(Utils.fetchArgocdResourcesFromURL(argoConfig.version())).items();
+        List<HasMetadata> items = client.load(Utils.fetchArgocdResourcesFromURL(argoConfig.version())).items();
 
         LOG.infof("Creating the argocd controller namespace: %s", ARGOCD_CONTROLLER_NAMESPACE);
         // @formatter:off
