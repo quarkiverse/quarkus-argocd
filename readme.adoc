@@ -111,6 +111,20 @@ dependencies {
 
 After this step the Argo CD yaml files will be generated under the `.argocd` directory within the project root as part of the build.
 
+[[helm-integration]]
+=== Integration with Quarkus Helm
+
+The extension depends on https://docs.quarkiverse.io/quarkus-helm/dev/index.html[Quarkus Helm], which generates a Helm chart for the application from the Kubernetes resources produced by the Quarkus Kubernetes extensions.
+
+The generated `Application` deploys this chart with its `values.yaml` file. Its `spec.source.path` is `.helm/<deployment-target>/<application-name>`, relative to the Git repository root, where `<deployment-target>` is `openshift` when the OpenShift extension is used and `kubernetes` otherwise.
+
+By default, Quarkus Helm generates the chart under the build output directory (`target/helm`), which is not pushed. To generate it where the `Application` expects it and commit it, configure:
+
+[source,properties]
+----
+quarkus.helm.output-directory=../.helm
+----
+
 === Using the CLI
 
 The project provides a companion CLI that can be used to generate, install / uninstall and list the Argo CD Applications.
@@ -141,7 +155,7 @@ To install the generated `Application` and `AppProject` (optional) custom resour
 ```shell
 quarkus argocd project install
 ```
-*Note*: In case of un-committed or un-pushed changes the command will prompt users to decide if they want to proceed with the installation.
+*Note*: In case of un-committed or un-pushed changes, or when the path of the `Application` (see <<helm-integration>>) is not committed in the Git repository, the command will prompt users to decide if they want to proceed with the installation.
 
 The `currently connected Kubernetes cluster` is the one that is configured in the `~/.kube/config` file.
 It can be overridden by setting in `applcation.properties` a different API server URL and token. See the `quarkus-kubernetes-client` extension for more details.
