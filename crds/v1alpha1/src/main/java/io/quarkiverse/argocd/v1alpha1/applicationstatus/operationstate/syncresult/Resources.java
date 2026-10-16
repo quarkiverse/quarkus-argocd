@@ -1,8 +1,8 @@
 package io.quarkiverse.argocd.v1alpha1.applicationstatus.operationstate.syncresult;
 
 @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "group", "hookPhase", "hookType", "kind", "message", "name", "namespace",
-        "status", "syncPhase", "version" })
+@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "group", "hookPhase", "hookType", "images", "kind", "message", "name",
+        "namespace", "status", "syncPhase", "version" })
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
 @lombok.ToString()
 @lombok.EqualsAndHashCode()
@@ -42,11 +42,11 @@ public class Resources implements io.fabric8.kubernetes.api.builder.Editable<Res
     }
 
     /**
-     * HookPhase contains the state of any operation associated with this resource OR hook This can also contain values for
-     * non-hook resources.
+     * HookPhase contains the state of any operation associated with this resource OR hook
+     * This can also contain values for non-hook resources.
      */
     @com.fasterxml.jackson.annotation.JsonProperty("hookPhase")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("HookPhase contains the state of any operation associated with this resource OR hook This can also contain values for non-hook resources.")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("HookPhase contains the state of any operation associated with this resource OR hook\nThis can also contain values for non-hook resources.")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private String hookPhase;
 
@@ -72,6 +72,22 @@ public class Resources implements io.fabric8.kubernetes.api.builder.Editable<Res
 
     public void setHookType(String hookType) {
         this.hookType = hookType;
+    }
+
+    /**
+     * Images contains the images related to the ResourceResult
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("images")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Images contains the images related to the ResourceResult")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private java.util.List<String> images;
+
+    public java.util.List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(java.util.List<String> images) {
+        this.images = images;
     }
 
     /**

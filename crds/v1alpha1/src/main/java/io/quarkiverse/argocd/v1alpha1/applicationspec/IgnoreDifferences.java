@@ -78,7 +78,7 @@ public class IgnoreDifferences implements io.fabric8.kubernetes.api.builder.Edit
      * desired state defined in the SCM and won't be displayed in diffs
      */
     @com.fasterxml.jackson.annotation.JsonProperty("managedFieldsManagers")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("ManagedFieldsManagers is a list of trusted managers. Fields mutated by those managers will take precedence over the desired state defined in the SCM and won't be displayed in diffs")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("ManagedFieldsManagers is a list of trusted managers. Fields mutated by those managers will take precedence over the\ndesired state defined in the SCM and won't be displayed in diffs")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private java.util.List<String> managedFieldsManagers;
 

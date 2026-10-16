@@ -1,7 +1,7 @@
 package io.quarkiverse.argocd.v1alpha1.applicationstatus.resources;
 
 @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "message", "status" })
+@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "lastTransitionTime", "message", "status" })
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
 @lombok.ToString()
 @lombok.EqualsAndHashCode()
@@ -24,6 +24,26 @@ public class Health implements io.fabric8.kubernetes.api.builder.Editable<Health
     }
 
     /**
+     * LastTransitionTime is the time the HealthStatus was set or updated
+     *
+     * Deprecated: this field is not used and will be removed in a future release.
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("lastTransitionTime")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("LastTransitionTime is the time the HealthStatus was set or updated\n\nDeprecated: this field is not used and will be removed in a future release.")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private java.time.ZonedDateTime lastTransitionTime;
+
+    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
+    public java.time.ZonedDateTime getLastTransitionTime() {
+        return lastTransitionTime;
+    }
+
+    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
+    public void setLastTransitionTime(java.time.ZonedDateTime lastTransitionTime) {
+        this.lastTransitionTime = lastTransitionTime;
+    }
+
+    /**
      * Message is a human-readable informational message describing the health status
      */
     @com.fasterxml.jackson.annotation.JsonProperty("message")
@@ -40,10 +60,10 @@ public class Health implements io.fabric8.kubernetes.api.builder.Editable<Health
     }
 
     /**
-     * Status holds the status code of the application or resource
+     * Status holds the status code of the resource
      */
     @com.fasterxml.jackson.annotation.JsonProperty("status")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Status holds the status code of the application or resource")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Status holds the status code of the resource")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private String status;
 
