@@ -267,7 +267,7 @@ endif::add-copy-button-to-config-props[]
 
 [.description]
 --
-The cluster type to be used: kind or k3 The default value is: kind
+The cluster type to be used: kind or k3s The default value is: kind
 
 
 ifdef::add-copy-button-to-env-var[]
