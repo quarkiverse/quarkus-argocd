@@ -33,6 +33,8 @@ The following table lists, for each release of the extension, the main versions 
 | 0.0.1 - 0.0.3 | 3.14.4 | 6.13.1 | 0.103.1
 |===
 
+The Argo CD model (`io.quarkiverse.argocd.v1alpha1.*`) of the next release is generated from the `Application` and `AppProject` CRDs of Argo CD `v3.5.5`.
+
 === Breaking changes in the next release (after 0.5.0)
 
 The Argo CD model (`io.quarkiverse.argocd.v1alpha1.*`) is generated with https://github.com/sundrio/sundrio[Sundrio].

@@ -2,7 +2,8 @@ package io.quarkiverse.argocd.v1alpha1;
 
 @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
 @com.fasterxml.jackson.annotation.JsonPropertyOrder({ "conditions", "controllerNamespace", "health", "history", "observedAt",
-        "operationState", "reconciledAt", "resourceHealthSource", "resources", "sourceType", "sourceTypes", "summary", "sync" })
+        "operationState", "reconciledAt", "resourceHealthSource", "resources", "sourceHydrator", "sourceType", "sourceTypes",
+        "summary", "sync" })
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
 @lombok.ToString()
 @lombok.EqualsAndHashCode()
@@ -89,20 +90,21 @@ public class ApplicationStatus implements io.fabric8.kubernetes.api.builder.Edit
     }
 
     /**
-     * ObservedAt indicates when the application state was updated without querying latest git state Deprecated: controller no
-     * longer updates ObservedAt field
+     * ObservedAt indicates when the application state was updated without querying latest git state
+     *
+     * Deprecated: controller no longer updates ObservedAt field
      */
     @com.fasterxml.jackson.annotation.JsonProperty("observedAt")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("ObservedAt indicates when the application state was updated without querying latest git state Deprecated: controller no longer updates ObservedAt field")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("ObservedAt indicates when the application state was updated without querying latest git state\n\nDeprecated: controller no longer updates ObservedAt field")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private java.time.ZonedDateTime observedAt;
 
-    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssVV")
+    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
     public java.time.ZonedDateTime getObservedAt() {
         return observedAt;
     }
 
-    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss[XXX][VV]")
+    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
     public void setObservedAt(java.time.ZonedDateTime observedAt) {
         this.observedAt = observedAt;
     }
@@ -131,12 +133,12 @@ public class ApplicationStatus implements io.fabric8.kubernetes.api.builder.Edit
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private java.time.ZonedDateTime reconciledAt;
 
-    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssVV")
+    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
     public java.time.ZonedDateTime getReconciledAt() {
         return reconciledAt;
     }
 
-    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss[XXX][VV]")
+    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
     public void setReconciledAt(java.time.ZonedDateTime reconciledAt) {
         this.reconciledAt = reconciledAt;
     }
@@ -171,6 +173,22 @@ public class ApplicationStatus implements io.fabric8.kubernetes.api.builder.Edit
 
     public void setResources(java.util.List<io.quarkiverse.argocd.v1alpha1.applicationstatus.Resources> resources) {
         this.resources = resources;
+    }
+
+    /**
+     * SourceHydrator stores information about the current state of source hydration
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("sourceHydrator")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("SourceHydrator stores information about the current state of source hydration")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private io.quarkiverse.argocd.v1alpha1.applicationstatus.SourceHydrator sourceHydrator;
+
+    public io.quarkiverse.argocd.v1alpha1.applicationstatus.SourceHydrator getSourceHydrator() {
+        return sourceHydrator;
+    }
+
+    public void setSourceHydrator(io.quarkiverse.argocd.v1alpha1.applicationstatus.SourceHydrator sourceHydrator) {
+        this.sourceHydrator = sourceHydrator;
     }
 
     /**

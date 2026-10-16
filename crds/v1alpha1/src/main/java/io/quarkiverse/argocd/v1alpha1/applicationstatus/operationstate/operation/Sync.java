@@ -1,8 +1,8 @@
 package io.quarkiverse.argocd.v1alpha1.applicationstatus.operationstate.operation;
 
 @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "dryRun", "manifests", "prune", "resources", "revision", "revisions",
-        "source", "sources", "syncOptions", "syncStrategy" })
+@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "autoHealAttemptsCount", "dryRun", "manifests", "prune", "resources",
+        "revision", "revisions", "source", "sources", "syncOptions", "syncStrategy" })
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
 @lombok.ToString()
 @lombok.EqualsAndHashCode()
@@ -22,6 +22,22 @@ public class Sync
     @java.lang.Override
     public SyncBuilder edit() {
         return new SyncBuilder(this);
+    }
+
+    /**
+     * SelfHealAttemptsCount contains the number of auto-heal attempts
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("autoHealAttemptsCount")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("SelfHealAttemptsCount contains the number of auto-heal attempts")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private Long autoHealAttemptsCount;
+
+    public Long getAutoHealAttemptsCount() {
+        return autoHealAttemptsCount;
+    }
+
+    public void setAutoHealAttemptsCount(Long autoHealAttemptsCount) {
+        this.autoHealAttemptsCount = autoHealAttemptsCount;
     }
 
     /**
@@ -90,11 +106,11 @@ public class Sync
     }
 
     /**
-     * Revision is the revision (Git) or chart version (Helm) which to sync the application to If omitted, will use the revision
-     * specified in app spec.
+     * Revision is the revision (Git) or chart version (Helm) which to sync the application to
+     * If omitted, will use the revision specified in app spec.
      */
     @com.fasterxml.jackson.annotation.JsonProperty("revision")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Revision is the revision (Git) or chart version (Helm) which to sync the application to If omitted, will use the revision specified in app spec.")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Revision is the revision (Git) or chart version (Helm) which to sync the application to\nIf omitted, will use the revision specified in app spec.")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private String revision;
 
@@ -108,10 +124,11 @@ public class Sync
 
     /**
      * Revisions is the list of revision (Git) or chart version (Helm) which to sync each source in sources field for the
-     * application to If omitted, will use the revision specified in app spec.
+     * application to
+     * If omitted, will use the revision specified in app spec.
      */
     @com.fasterxml.jackson.annotation.JsonProperty("revisions")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Revisions is the list of revision (Git) or chart version (Helm) which to sync each source in sources field for the application to If omitted, will use the revision specified in app spec.")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Revisions is the list of revision (Git) or chart version (Helm) which to sync each source in sources field for the application to\nIf omitted, will use the revision specified in app spec.")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private java.util.List<String> revisions;
 
@@ -124,11 +141,11 @@ public class Sync
     }
 
     /**
-     * Source overrides the source definition set in the application. This is typically set in a Rollback operation and is nil
-     * during a Sync operation
+     * Source overrides the source definition set in the application.
+     * This is typically set in a Rollback operation and is nil during a Sync operation
      */
     @com.fasterxml.jackson.annotation.JsonProperty("source")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Source overrides the source definition set in the application. This is typically set in a Rollback operation and is nil during a Sync operation")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Source overrides the source definition set in the application.\nThis is typically set in a Rollback operation and is nil during a Sync operation")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private io.quarkiverse.argocd.v1alpha1.applicationstatus.operationstate.operation.sync.Source source;
 
@@ -141,11 +158,11 @@ public class Sync
     }
 
     /**
-     * Sources overrides the source definition set in the application. This is typically set in a Rollback operation and is nil
-     * during a Sync operation
+     * Sources overrides the source definition set in the application.
+     * This is typically set in a Rollback operation and is nil during a Sync operation
      */
     @com.fasterxml.jackson.annotation.JsonProperty("sources")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Sources overrides the source definition set in the application. This is typically set in a Rollback operation and is nil during a Sync operation")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Sources overrides the source definition set in the application.\nThis is typically set in a Rollback operation and is nil during a Sync operation")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private java.util.List<io.quarkiverse.argocd.v1alpha1.applicationstatus.operationstate.operation.sync.Sources> sources;
 

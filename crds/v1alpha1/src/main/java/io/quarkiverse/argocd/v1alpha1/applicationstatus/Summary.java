@@ -1,7 +1,7 @@
 package io.quarkiverse.argocd.v1alpha1.applicationstatus;
 
 @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "externalURLs", "images" })
+@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "externalURLs", "images", "isAppOfApps" })
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
 @lombok.ToString()
 @lombok.EqualsAndHashCode()
@@ -53,5 +53,21 @@ public class Summary implements io.fabric8.kubernetes.api.builder.Editable<Summa
 
     public void setImages(java.util.List<String> images) {
         this.images = images;
+    }
+
+    /**
+     * IsAppOfApps holds true if the application has any application for child resource.
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("isAppOfApps")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("IsAppOfApps holds true if the application has any application for child resource.")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private Boolean isAppOfApps;
+
+    public Boolean getIsAppOfApps() {
+        return isAppOfApps;
+    }
+
+    public void setIsAppOfApps(Boolean isAppOfApps) {
+        this.isAppOfApps = isAppOfApps;
     }
 }

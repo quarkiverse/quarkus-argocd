@@ -1,7 +1,7 @@
 package io.quarkiverse.argocd.v1alpha1.applicationspec.syncpolicy;
 
 @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "allowEmpty", "prune", "selfHeal" })
+@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "allowEmpty", "enabled", "prune", "selfHeal" })
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
 @lombok.ToString()
 @lombok.EqualsAndHashCode()
@@ -37,6 +37,22 @@ public class Automated implements io.fabric8.kubernetes.api.builder.Editable<Aut
 
     public void setAllowEmpty(Boolean allowEmpty) {
         this.allowEmpty = allowEmpty;
+    }
+
+    /**
+     * Enable allows apps to explicitly control automated sync
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("enabled")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Enable allows apps to explicitly control automated sync")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private Boolean enabled;
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     /**
