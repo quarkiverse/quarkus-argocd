@@ -20,18 +20,21 @@ Generate Argo CD Application or Project as part of the Quarkus build or using th
 
 The following table lists, for each release of the extension, the main versions it was built with:
 
-[cols="1,1,1,1",options="header"]
+[cols="1,1,1,1,1",options="header"]
 |===
-| Quarkus ArgoCD | Quarkus | Fabric8 Kubernetes Client | Sundrio
+| Quarkus ArgoCD | Quarkus | Fabric8 Kubernetes Client | Sundrio | Argo CD CRDs
 
-| `999-SNAPSHOT` (next release) | 3.33.3 | 8.0.0 | 0.400.1
-| 0.5.0 | 3.33.3 | 7.7.0 | 0.103.1
-| 0.4.0 | 3.20.1 | 7.6.1 | 0.103.1
-| 0.3.0 | 3.19.2 | 7.1.0 | 0.103.1
-| 0.2.0 | 3.18.1 | 7.1.0 | 0.103.1
-| 0.1.0 | 3.17.3 | 6.13.1 | 0.103.1
-| 0.0.1 - 0.0.3 | 3.14.4 | 6.13.1 | 0.103.1
+| `999-SNAPSHOT` (next release) | 3.33.3 | 8.0.0 | 0.400.1 | v3.5.5
+| 0.5.0 | 3.33.3 | 7.7.0 | 0.103.1 | v2.11
+| 0.4.0 | 3.20.1 | 7.6.1 | 0.103.1 | v2.11
+| 0.3.0 | 3.19.2 | 7.1.0 | 0.103.1 | v2.11
+| 0.2.0 | 3.18.1 | 7.1.0 | 0.103.1 | v2.11
+| 0.1.0 | 3.17.3 | 6.13.1 | 0.103.1 | v2.11
+| 0.0.1 - 0.0.3 | 3.14.4 | 6.13.1 | 0.103.1 | v2.11
 |===
+
+The `Argo CD CRDs` column is the Argo CD version of the `Application` and `AppProject` CRDs the model (`io.quarkiverse.argocd.v1alpha1.*`) is generated from.
+Fields introduced by more recent Argo CD versions are not part of the model, and reading such resources from a cluster can fail.
 
 === Breaking changes in the next release (after 0.5.0)
 

@@ -1,8 +1,8 @@
 package io.quarkiverse.argocd.v1alpha1.applicationspec;
 
 @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "chart", "directory", "helm", "kustomize", "path", "plugin", "ref",
-        "repoURL", "targetRevision" })
+@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "chart", "directory", "helm", "kustomize", "name", "path", "plugin",
+        "ref", "repoURL", "tagPrefix", "targetRevision" })
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
 @lombok.ToString()
 @lombok.EqualsAndHashCode()
@@ -89,6 +89,22 @@ public class Sources implements io.fabric8.kubernetes.api.builder.Editable<Sourc
     }
 
     /**
+     * Name is used to refer to a source and is displayed in the UI. It is used in multi-source Applications.
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("name")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Name is used to refer to a source and is displayed in the UI. It is used in multi-source Applications.")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
      * Path is a directory path within the Git repository, and is only valid for applications sourced from Git.
      */
     @com.fasterxml.jackson.annotation.JsonProperty("path")
@@ -154,11 +170,31 @@ public class Sources implements io.fabric8.kubernetes.api.builder.Editable<Sourc
     }
 
     /**
-     * TargetRevision defines the revision of the source to sync the application to. In case of Git, this can be commit, tag, or
-     * branch. If omitted, will equal to HEAD. In case of Helm, this is a semver tag for the Chart's version.
+     * TagPrefix filters git tags to only those with this prefix before evaluating targetRevision as a semver constraint.
+     * The prefix is stripped from tag names before comparison and re-added to the resolved version.
+     * For example, with tagPrefix "component-b/" and targetRevision "1.0.*", tags like "component-b/1.0.0" and
+     * "component-b/1.0.1" are candidates, and the constraint resolves to "component-b/1.0.1".
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("tagPrefix")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("TagPrefix filters git tags to only those with this prefix before evaluating targetRevision as a semver constraint.\nThe prefix is stripped from tag names before comparison and re-added to the resolved version.\nFor example, with tagPrefix \"component-b/\" and targetRevision \"1.0.*\", tags like \"component-b/1.0.0\" and\n\"component-b/1.0.1\" are candidates, and the constraint resolves to \"component-b/1.0.1\".")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private String tagPrefix;
+
+    public String getTagPrefix() {
+        return tagPrefix;
+    }
+
+    public void setTagPrefix(String tagPrefix) {
+        this.tagPrefix = tagPrefix;
+    }
+
+    /**
+     * TargetRevision defines the revision of the source to sync the application to.
+     * In case of Git, this can be commit, tag, or branch. If omitted, will equal to HEAD.
+     * In case of Helm, this is a semver tag for the Chart's version.
      */
     @com.fasterxml.jackson.annotation.JsonProperty("targetRevision")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("TargetRevision defines the revision of the source to sync the application to. In case of Git, this can be commit, tag, or branch. If omitted, will equal to HEAD. In case of Helm, this is a semver tag for the Chart's version.")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("TargetRevision defines the revision of the source to sync the application to.\nIn case of Git, this can be commit, tag, or branch. If omitted, will equal to HEAD.\nIn case of Helm, this is a semver tag for the Chart's version.")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private String targetRevision;
 

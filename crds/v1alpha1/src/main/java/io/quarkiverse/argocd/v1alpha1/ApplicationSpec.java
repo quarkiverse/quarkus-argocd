@@ -2,7 +2,7 @@ package io.quarkiverse.argocd.v1alpha1;
 
 @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
 @com.fasterxml.jackson.annotation.JsonPropertyOrder({ "destination", "ignoreDifferences", "info", "project",
-        "revisionHistoryLimit", "source", "sources", "syncPolicy" })
+        "revisionHistoryLimit", "source", "sourceHydrator", "sources", "syncPolicy" })
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
 @lombok.ToString()
 @lombok.EqualsAndHashCode()
@@ -75,12 +75,12 @@ public class ApplicationSpec implements io.fabric8.kubernetes.api.builder.Editab
     }
 
     /**
-     * Project is a reference to the project this application belongs to. The empty string means that application belongs to the
-     * 'default' project.
+     * Project is a reference to the project this application belongs to.
+     * The empty string means that application belongs to the 'default' project.
      */
     @com.fasterxml.jackson.annotation.JsonProperty("project")
     @io.fabric8.generator.annotation.Required()
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Project is a reference to the project this application belongs to. The empty string means that application belongs to the 'default' project.")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Project is a reference to the project this application belongs to.\nThe empty string means that application belongs to the 'default' project.")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private String project;
 
@@ -94,12 +94,14 @@ public class ApplicationSpec implements io.fabric8.kubernetes.api.builder.Editab
 
     /**
      * RevisionHistoryLimit limits the number of items kept in the application's revision history, which is used for
-     * informational purposes as well as for rollbacks to previous versions. This should only be changed in exceptional
-     * circumstances. Setting to zero will store no history. This will reduce storage used. Increasing will increase the space
-     * used to store the history, so we do not recommend increasing it. Default is 10.
+     * informational purposes as well as for rollbacks to previous versions.
+     * This should only be changed in exceptional circumstances.
+     * Setting to zero will store no history. This will reduce storage used.
+     * Increasing will increase the space used to store the history, so we do not recommend increasing it.
+     * Default is 10.
      */
     @com.fasterxml.jackson.annotation.JsonProperty("revisionHistoryLimit")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("RevisionHistoryLimit limits the number of items kept in the application's revision history, which is used for informational purposes as well as for rollbacks to previous versions. This should only be changed in exceptional circumstances. Setting to zero will store no history. This will reduce storage used. Increasing will increase the space used to store the history, so we do not recommend increasing it. Default is 10.")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("RevisionHistoryLimit limits the number of items kept in the application's revision history, which is used for informational purposes as well as for rollbacks to previous versions.\nThis should only be changed in exceptional circumstances.\nSetting to zero will store no history. This will reduce storage used.\nIncreasing will increase the space used to store the history, so we do not recommend increasing it.\nDefault is 10.")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private Long revisionHistoryLimit;
 
@@ -125,6 +127,22 @@ public class ApplicationSpec implements io.fabric8.kubernetes.api.builder.Editab
 
     public void setSource(io.quarkiverse.argocd.v1alpha1.applicationspec.Source source) {
         this.source = source;
+    }
+
+    /**
+     * SourceHydrator provides a way to push hydrated manifests back to git before syncing them to the cluster.
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("sourceHydrator")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("SourceHydrator provides a way to push hydrated manifests back to git before syncing them to the cluster.")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private io.quarkiverse.argocd.v1alpha1.applicationspec.SourceHydrator sourceHydrator;
+
+    public io.quarkiverse.argocd.v1alpha1.applicationspec.SourceHydrator getSourceHydrator() {
+        return sourceHydrator;
+    }
+
+    public void setSourceHydrator(io.quarkiverse.argocd.v1alpha1.applicationspec.SourceHydrator sourceHydrator) {
+        this.sourceHydrator = sourceHydrator;
     }
 
     /**

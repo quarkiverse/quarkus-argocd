@@ -1,8 +1,9 @@
 package io.quarkiverse.argocd.v1alpha1.applicationspec.sources;
 
 @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "fileParameters", "ignoreMissingValueFiles", "parameters",
-        "passCredentials", "releaseName", "skipCrds", "valueFiles", "values", "valuesObject", "version" })
+@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "apiVersions", "fileParameters", "ignoreMissingValueFiles", "kubeVersion",
+        "namespace", "parameters", "passCredentials", "releaseName", "skipCrds", "skipSchemaValidation", "skipTests",
+        "valueFiles", "values", "valuesObject", "version" })
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
 @lombok.ToString()
 @lombok.EqualsAndHashCode()
@@ -22,6 +23,23 @@ public class Helm
     @java.lang.Override
     public HelmBuilder edit() {
         return new HelmBuilder(this);
+    }
+
+    /**
+     * APIVersions specifies the Kubernetes resource API versions to pass to Helm when templating manifests. By default,
+     * Argo CD uses the API versions of the target cluster. The format is [group/]version/kind.
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("apiVersions")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("APIVersions specifies the Kubernetes resource API versions to pass to Helm when templating manifests. By default,\nArgo CD uses the API versions of the target cluster. The format is [group/]version/kind.")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private java.util.List<String> apiVersions;
+
+    public java.util.List<String> getApiVersions() {
+        return apiVersions;
+    }
+
+    public void setApiVersions(java.util.List<String> apiVersions) {
+        this.apiVersions = apiVersions;
     }
 
     /**
@@ -56,6 +74,39 @@ public class Helm
 
     public void setIgnoreMissingValueFiles(Boolean ignoreMissingValueFiles) {
         this.ignoreMissingValueFiles = ignoreMissingValueFiles;
+    }
+
+    /**
+     * KubeVersion specifies the Kubernetes API version to pass to Helm when templating manifests. By default, Argo CD
+     * uses the Kubernetes version of the target cluster.
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("kubeVersion")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("KubeVersion specifies the Kubernetes API version to pass to Helm when templating manifests. By default, Argo CD\nuses the Kubernetes version of the target cluster.")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private String kubeVersion;
+
+    public String getKubeVersion() {
+        return kubeVersion;
+    }
+
+    public void setKubeVersion(String kubeVersion) {
+        this.kubeVersion = kubeVersion;
+    }
+
+    /**
+     * Namespace is an optional namespace to template with. If left empty, defaults to the app's destination namespace.
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("namespace")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Namespace is an optional namespace to template with. If left empty, defaults to the app's destination namespace.")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private String namespace;
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
     }
 
     /**
@@ -121,6 +172,38 @@ public class Helm
 
     public void setSkipCrds(Boolean skipCrds) {
         this.skipCrds = skipCrds;
+    }
+
+    /**
+     * SkipSchemaValidation skips JSON schema validation (Helm's --skip-schema-validation)
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("skipSchemaValidation")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("SkipSchemaValidation skips JSON schema validation (Helm's --skip-schema-validation)")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private Boolean skipSchemaValidation;
+
+    public Boolean getSkipSchemaValidation() {
+        return skipSchemaValidation;
+    }
+
+    public void setSkipSchemaValidation(Boolean skipSchemaValidation) {
+        this.skipSchemaValidation = skipSchemaValidation;
+    }
+
+    /**
+     * SkipTests skips test manifest installation step (Helm's --skip-tests).
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("skipTests")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("SkipTests skips test manifest installation step (Helm's --skip-tests).")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private Boolean skipTests;
+
+    public Boolean getSkipTests() {
+        return skipTests;
+    }
+
+    public void setSkipTests(Boolean skipTests) {
+        this.skipTests = skipTests;
     }
 
     /**

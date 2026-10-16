@@ -2,8 +2,9 @@ package io.quarkiverse.argocd.v1alpha1;
 
 @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
 @com.fasterxml.jackson.annotation.JsonPropertyOrder({ "clusterResourceBlacklist", "clusterResourceWhitelist", "description",
-        "destinations", "namespaceResourceBlacklist", "namespaceResourceWhitelist", "orphanedResources",
-        "permitOnlyProjectScopedClusters", "roles", "signatureKeys", "sourceNamespaces", "sourceRepos", "syncWindows" })
+        "destinationServiceAccounts", "destinations", "namespaceResourceBlacklist", "namespaceResourceWhitelist",
+        "orphanedResources", "permitOnlyProjectScopedClusters", "roles", "signatureKeys", "sourceIntegrity", "sourceNamespaces",
+        "sourceRepos", "syncWindows" })
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
 @lombok.ToString()
 @lombok.EqualsAndHashCode()
@@ -73,6 +74,24 @@ public class AppProjectSpec implements io.fabric8.kubernetes.api.builder.Editabl
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+     * DestinationServiceAccounts holds information about the service accounts to be impersonated for the application sync
+     * operation for each destination.
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("destinationServiceAccounts")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("DestinationServiceAccounts holds information about the service accounts to be impersonated for the application sync operation for each destination.")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private java.util.List<io.quarkiverse.argocd.v1alpha1.appprojectspec.DestinationServiceAccounts> destinationServiceAccounts;
+
+    public java.util.List<io.quarkiverse.argocd.v1alpha1.appprojectspec.DestinationServiceAccounts> getDestinationServiceAccounts() {
+        return destinationServiceAccounts;
+    }
+
+    public void setDestinationServiceAccounts(
+            java.util.List<io.quarkiverse.argocd.v1alpha1.appprojectspec.DestinationServiceAccounts> destinationServiceAccounts) {
+        this.destinationServiceAccounts = destinationServiceAccounts;
     }
 
     /**
@@ -175,9 +194,11 @@ public class AppProjectSpec implements io.fabric8.kubernetes.api.builder.Editabl
 
     /**
      * SignatureKeys contains a list of PGP key IDs that commits in Git must be signed with in order to be allowed for sync
+     *
+     * Deprecated: Use SourceIntegrity instead. SignatureKeys will be removed with the next major version.
      */
     @com.fasterxml.jackson.annotation.JsonProperty("signatureKeys")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("SignatureKeys contains a list of PGP key IDs that commits in Git must be signed with in order to be allowed for sync")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("SignatureKeys contains a list of PGP key IDs that commits in Git must be signed with in order to be allowed for sync\n\nDeprecated: Use SourceIntegrity instead. SignatureKeys will be removed with the next major version.")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private java.util.List<io.quarkiverse.argocd.v1alpha1.appprojectspec.SignatureKeys> signatureKeys;
 
@@ -187,6 +208,23 @@ public class AppProjectSpec implements io.fabric8.kubernetes.api.builder.Editabl
 
     public void setSignatureKeys(java.util.List<io.quarkiverse.argocd.v1alpha1.appprojectspec.SignatureKeys> signatureKeys) {
         this.signatureKeys = signatureKeys;
+    }
+
+    /**
+     * SourceIntegrity represents a constraint on manifest sources integrity to be met before they can be used.
+     * Do not access directly, use EffectiveSourceIntegrity() for correct backwards compatibility handling.
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("sourceIntegrity")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("SourceIntegrity represents a constraint on manifest sources integrity to be met before they can be used.\nDo not access directly, use EffectiveSourceIntegrity() for correct backwards compatibility handling.")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private io.quarkiverse.argocd.v1alpha1.appprojectspec.SourceIntegrity sourceIntegrity;
+
+    public io.quarkiverse.argocd.v1alpha1.appprojectspec.SourceIntegrity getSourceIntegrity() {
+        return sourceIntegrity;
+    }
+
+    public void setSourceIntegrity(io.quarkiverse.argocd.v1alpha1.appprojectspec.SourceIntegrity sourceIntegrity) {
+        this.sourceIntegrity = sourceIntegrity;
     }
 
     /**

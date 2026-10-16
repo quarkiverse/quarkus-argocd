@@ -1,8 +1,8 @@
 package io.quarkiverse.argocd.v1alpha1.appprojectspec;
 
 @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "applications", "clusters", "duration", "kind", "manualSync",
-        "namespaces", "schedule", "timeZone" })
+@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "andOperator", "applications", "clusters", "description", "duration",
+        "kind", "manualSync", "namespaces", "schedule", "syncOverrun", "timeZone" })
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
 @lombok.ToString()
 @lombok.EqualsAndHashCode()
@@ -22,6 +22,22 @@ public class SyncWindows implements io.fabric8.kubernetes.api.builder.Editable<S
     @java.lang.Override
     public SyncWindowsBuilder edit() {
         return new SyncWindowsBuilder(this);
+    }
+
+    /**
+     * UseAndOperator use AND operator for matching applications, namespaces and clusters instead of the default OR operator
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("andOperator")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("UseAndOperator use AND operator for matching applications, namespaces and clusters instead of the default OR operator")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private Boolean andOperator;
+
+    public Boolean getAndOperator() {
+        return andOperator;
+    }
+
+    public void setAndOperator(Boolean andOperator) {
+        this.andOperator = andOperator;
     }
 
     /**
@@ -54,6 +70,23 @@ public class SyncWindows implements io.fabric8.kubernetes.api.builder.Editable<S
 
     public void setClusters(java.util.List<String> clusters) {
         this.clusters = clusters;
+    }
+
+    /**
+     * Description of the sync that will be applied to the schedule, can be used to add any information such as a ticket number
+     * for example
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("description")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Description of the sync that will be applied to the schedule, can be used to add any information such as a ticket number for example")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     /**
@@ -134,6 +167,24 @@ public class SyncWindows implements io.fabric8.kubernetes.api.builder.Editable<S
 
     public void setSchedule(String schedule) {
         this.schedule = schedule;
+    }
+
+    /**
+     * SyncOverrun allows ongoing syncs to continue in two scenarios:
+     * For deny windows: allows syncs that started before the deny window became active to continue running
+     * For allow windows: allows syncs that started during the allow window to continue after the window ends
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("syncOverrun")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("SyncOverrun allows ongoing syncs to continue in two scenarios:\nFor deny windows: allows syncs that started before the deny window became active to continue running\nFor allow windows: allows syncs that started during the allow window to continue after the window ends")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private Boolean syncOverrun;
+
+    public Boolean getSyncOverrun() {
+        return syncOverrun;
+    }
+
+    public void setSyncOverrun(Boolean syncOverrun) {
+        this.syncOverrun = syncOverrun;
     }
 
     /**

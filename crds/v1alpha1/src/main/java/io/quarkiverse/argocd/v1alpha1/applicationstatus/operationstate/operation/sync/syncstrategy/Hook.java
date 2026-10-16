@@ -24,11 +24,12 @@ public class Hook
     }
 
     /**
-     * Force indicates whether or not to supply the --force flag to `kubectl apply`. The --force flag deletes and re-create the
-     * resource, when PATCH encounters conflict and has retried for 5 times.
+     * Force indicates whether or not to supply the --force flag to `kubectl apply`.
+     * The --force flag deletes and re-create the resource, when PATCH encounters conflict and has
+     * retried for 5 times.
      */
     @com.fasterxml.jackson.annotation.JsonProperty("force")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Force indicates whether or not to supply the --force flag to `kubectl apply`. The --force flag deletes and re-create the resource, when PATCH encounters conflict and has retried for 5 times.")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Force indicates whether or not to supply the --force flag to `kubectl apply`.\nThe --force flag deletes and re-create the resource, when PATCH encounters conflict and has\nretried for 5 times.")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private Boolean force;
 

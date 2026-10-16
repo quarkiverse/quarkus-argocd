@@ -1,8 +1,8 @@
 package io.quarkiverse.argocd.v1alpha1.applicationstatus;
 
 @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "group", "health", "hook", "kind", "name", "namespace", "requiresPruning",
-        "status", "syncWave", "version" })
+@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "group", "health", "hook", "kind", "name", "namespace",
+        "requiresDeletionConfirmation", "requiresPruning", "status", "syncWave", "version" })
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
 @lombok.ToString()
 @lombok.EqualsAndHashCode()
@@ -24,7 +24,11 @@ public class Resources implements io.fabric8.kubernetes.api.builder.Editable<Res
         return new ResourcesBuilder(this);
     }
 
+    /**
+     * Group represents the API group of the resource (e.g., "apps" for Deployments).
+     */
     @com.fasterxml.jackson.annotation.JsonProperty("group")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Group represents the API group of the resource (e.g., \"apps\" for Deployments).")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private String group;
 
@@ -37,10 +41,10 @@ public class Resources implements io.fabric8.kubernetes.api.builder.Editable<Res
     }
 
     /**
-     * HealthStatus contains information about the currently observed health state of an application or resource
+     * Health indicates the health status of the resource (e.g., Healthy, Degraded, Progressing).
      */
     @com.fasterxml.jackson.annotation.JsonProperty("health")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("HealthStatus contains information about the currently observed health state of an application or resource")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Health indicates the health status of the resource (e.g., Healthy, Degraded, Progressing).")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private io.quarkiverse.argocd.v1alpha1.applicationstatus.resources.Health health;
 
@@ -52,7 +56,11 @@ public class Resources implements io.fabric8.kubernetes.api.builder.Editable<Res
         this.health = health;
     }
 
+    /**
+     * Hook is true if the resource is used as a lifecycle hook in an Argo CD application.
+     */
     @com.fasterxml.jackson.annotation.JsonProperty("hook")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Hook is true if the resource is used as a lifecycle hook in an Argo CD application.")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private Boolean hook;
 
@@ -64,7 +72,11 @@ public class Resources implements io.fabric8.kubernetes.api.builder.Editable<Res
         this.hook = hook;
     }
 
+    /**
+     * Kind specifies the type of the resource (e.g., "Deployment", "Service").
+     */
     @com.fasterxml.jackson.annotation.JsonProperty("kind")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Kind specifies the type of the resource (e.g., \"Deployment\", \"Service\").")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private String kind;
 
@@ -76,7 +88,11 @@ public class Resources implements io.fabric8.kubernetes.api.builder.Editable<Res
         this.kind = kind;
     }
 
+    /**
+     * Name is the unique name of the resource within the namespace.
+     */
     @com.fasterxml.jackson.annotation.JsonProperty("name")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Name is the unique name of the resource within the namespace.")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private String name;
 
@@ -88,7 +104,11 @@ public class Resources implements io.fabric8.kubernetes.api.builder.Editable<Res
         this.name = name;
     }
 
+    /**
+     * Namespace defines the Kubernetes namespace where the resource is located.
+     */
     @com.fasterxml.jackson.annotation.JsonProperty("namespace")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Namespace defines the Kubernetes namespace where the resource is located.")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private String namespace;
 
@@ -100,7 +120,27 @@ public class Resources implements io.fabric8.kubernetes.api.builder.Editable<Res
         this.namespace = namespace;
     }
 
+    /**
+     * RequiresDeletionConfirmation is true if the resource requires explicit user confirmation before deletion.
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("requiresDeletionConfirmation")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("RequiresDeletionConfirmation is true if the resource requires explicit user confirmation before deletion.")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private Boolean requiresDeletionConfirmation;
+
+    public Boolean getRequiresDeletionConfirmation() {
+        return requiresDeletionConfirmation;
+    }
+
+    public void setRequiresDeletionConfirmation(Boolean requiresDeletionConfirmation) {
+        this.requiresDeletionConfirmation = requiresDeletionConfirmation;
+    }
+
+    /**
+     * RequiresPruning is true if the resource needs to be pruned (deleted) as part of synchronization.
+     */
     @com.fasterxml.jackson.annotation.JsonProperty("requiresPruning")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("RequiresPruning is true if the resource needs to be pruned (deleted) as part of synchronization.")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private Boolean requiresPruning;
 
@@ -113,10 +153,10 @@ public class Resources implements io.fabric8.kubernetes.api.builder.Editable<Res
     }
 
     /**
-     * SyncStatusCode is a type which represents possible comparison results
+     * Status represents the synchronization state of the resource (e.g., Synced, OutOfSync).
      */
     @com.fasterxml.jackson.annotation.JsonProperty("status")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("SyncStatusCode is a type which represents possible comparison results")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Status represents the synchronization state of the resource (e.g., Synced, OutOfSync).")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private String status;
 
@@ -128,7 +168,12 @@ public class Resources implements io.fabric8.kubernetes.api.builder.Editable<Res
         this.status = status;
     }
 
+    /**
+     * SyncWave determines the order in which resources are applied during a sync operation.
+     * Lower values are applied first.
+     */
     @com.fasterxml.jackson.annotation.JsonProperty("syncWave")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("SyncWave determines the order in which resources are applied during a sync operation.\nLower values are applied first.")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private Long syncWave;
 
@@ -140,7 +185,11 @@ public class Resources implements io.fabric8.kubernetes.api.builder.Editable<Res
         this.syncWave = syncWave;
     }
 
+    /**
+     * Version indicates the API version of the resource (e.g., "v1", "v1beta1").
+     */
     @com.fasterxml.jackson.annotation.JsonProperty("version")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Version indicates the API version of the resource (e.g., \"v1\", \"v1beta1\").")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private String version;
 

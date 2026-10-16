@@ -1,7 +1,7 @@
 package io.quarkiverse.argocd.v1alpha1.applicationspec.syncpolicy;
 
 @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "backoff", "limit" })
+@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "backoff", "limit", "refresh" })
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
 @lombok.ToString()
 @lombok.EqualsAndHashCode()
@@ -53,5 +53,21 @@ public class Retry implements io.fabric8.kubernetes.api.builder.Editable<RetryBu
 
     public void setLimit(Long limit) {
         this.limit = limit;
+    }
+
+    /**
+     * Refresh indicates if the latest revision should be used on retry instead of the initial one (default: false)
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("refresh")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Refresh indicates if the latest revision should be used on retry instead of the initial one (default: false)")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private Boolean refresh;
+
+    public Boolean getRefresh() {
+        return refresh;
+    }
+
+    public void setRefresh(Boolean refresh) {
+        this.refresh = refresh;
     }
 }
