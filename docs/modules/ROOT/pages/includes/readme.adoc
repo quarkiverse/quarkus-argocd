@@ -78,6 +78,19 @@ new ApplicationBuilder()
     .build();
 ----
 
+The Dev Service no longer installs the retired https://github.com/kubernetes/ingress-nginx[NGINX ingress controller] nor creates an ingress for the Argo CD server, which was not reachable from the host: the Argo CD UI is reached through the port forward (see <<dev-services>>).
+Its configuration properties changed as follows:
+
+[cols="1,1",options="header"]
+|===
+| Before (0.5.0 and older) | After
+
+| `quarkus.argocd.devservices.ingress.port-forward-enabled` | `quarkus.argocd.devservices.port-forward-enabled`
+| `quarkus.argocd.devservices.ingress.version` | removed
+|===
+
+The previous properties are no longer recognized: Quarkus logs a warning and ignores them, so `quarkus.argocd.devservices.ingress.port-forward-enabled=false` must be renamed to keep the port forward disabled.
+
 == Building
 
 To build the extension use the following command:
@@ -288,6 +301,7 @@ Example:
 quarkus argocd project generate --destination-namespace=my-app --target-revision=develop
 ```
 
+[[dev-services]]
 == Dev Services
 
 In dev and test mode, the extension starts a Kubernetes cluster with https://quarkus.io/guides/kubernetes-dev-services[Kubernetes Dev Services] and installs Argo CD on it.
@@ -296,10 +310,10 @@ A container runtime (Docker or Podman) is required.
 The Dev Service:
 
 - starts a cluster of type `quarkus.argocd.devservices.cluster-type` (default: `kind`)
-- installs the https://github.com/kubernetes/ingress-nginx[NGINX ingress controller] (see https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/[Ingress controllers])
 - installs Argo CD `quarkus.argocd.devservices.version` (default: `v3.5.5`) in the `quarkus.argocd.devservices.control-plane-namespace` namespace (default: `argocd`), without the Dex and notifications components
-- creates an ingress for the Argo CD server using the host `quarkus.argocd.devservices.host-name` (default: `argocd.localtest.me`)
-- forwards the Argo CD server port to `quarkus.argocd.devservices.host-port` (default: `8443`) on the host, unless `quarkus.argocd.devservices.ingress.port-forward-enabled` is `false`
+- forwards the Argo CD server port to `quarkus.argocd.devservices.host-port` (default: `8443`) on the host, unless `quarkus.argocd.devservices.port-forward-enabled` is `false`
+
+The cluster only exposes its API server port to the host, so the Argo CD UI is reached through the port forward.
 
 When the port forward is enabled, the Argo CD UI is available at `http://<host-name>:<host-port>` (default: http://argocd.localtest.me:8443) and a link to it is shown in the Dev UI card, together with the installed Argo CD version.
 It can be accessed with the user `admin`. Its password is printed in the application logs.
