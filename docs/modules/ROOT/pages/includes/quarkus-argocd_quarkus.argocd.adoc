@@ -204,7 +204,7 @@ endif::add-copy-button-to-config-props[]
 
 [.description]
 --
-The version of Argocd to be installed from the GitHub repository It can be: "latest" or a tagged release expressed as such: "v2.13.2"
+The version of Argocd to be installed from the GitHub repository It can be: "latest" or a tagged release expressed as such: "v3.5.5"
 
 
 ifdef::add-copy-button-to-env-var[]
@@ -215,7 +215,7 @@ Environment variable: `+++QUARKUS_ARGOCD_DEVSERVICES_VERSION+++`
 endif::add-copy-button-to-env-var[]
 --
 |string
-|`+++v2.13.2+++`
+|`+++v3.5.5+++`
 
 a|icon:lock[title=Fixed at build time] [[quarkus-argocd_quarkus-argocd-devservices-control-plane-namespace]] [.property-path]##link:#quarkus-argocd_quarkus-argocd-devservices-control-plane-namespace[`+++quarkus.argocd.devservices.control-plane-namespace+++`]##
 ifdef::add-copy-button-to-config-props[]

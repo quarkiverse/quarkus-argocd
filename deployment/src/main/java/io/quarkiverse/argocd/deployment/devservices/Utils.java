@@ -18,7 +18,7 @@ public class Utils {
     protected static InputStream fetchArgocdResourcesFromURL(String version) {
         InputStream resourceAsStream = null;
         try {
-            if (version == "latest") {
+            if ("latest".equals(version)) {
                 resourceAsStream = new URL(
                         "https://raw.githubusercontent.com/argoproj/argo-cd/refs/heads/master/manifests/install.yaml")
                         .openStream();
@@ -37,7 +37,7 @@ public class Utils {
     protected static InputStream fetchIngressResourcesFromURL(String version) {
         InputStream resourceAsStream = null;
         try {
-            if (version == "latest") {
+            if ("latest".equals(version)) {
                 resourceAsStream = new URL(
                         "https://raw.githubusercontent.com/kubernetes/ingress-nginx/refs/heads/main/deploy/static/provider/kind/deploy.yaml")
                         .openStream();

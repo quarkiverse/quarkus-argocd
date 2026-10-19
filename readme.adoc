@@ -297,7 +297,7 @@ The Dev Service:
 
 - starts a cluster of type `quarkus.argocd.devservices.cluster-type` (default: `kind`)
 - installs the https://github.com/kubernetes/ingress-nginx[NGINX ingress controller] (see https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/[Ingress controllers])
-- installs Argo CD `quarkus.argocd.devservices.version` (default: `v2.13.2`) in the `quarkus.argocd.devservices.control-plane-namespace` namespace (default: `argocd`), without the Dex and notifications components
+- installs Argo CD `quarkus.argocd.devservices.version` (default: `v3.5.5`) in the `quarkus.argocd.devservices.control-plane-namespace` namespace (default: `argocd`), without the Dex and notifications components
 - creates an ingress for the Argo CD server using the host `quarkus.argocd.devservices.host-name` (default: `argocd.localtest.me`)
 - forwards the Argo CD server port to `quarkus.argocd.devservices.host-port` (default: `8443`) on the host, unless `quarkus.argocd.devservices.ingress.port-forward-enabled` is `false`
 

@@ -29,9 +29,9 @@ public interface ArgocdDevServiceConfig {
 
     /**
      * The version of Argocd to be installed from the GitHub repository
-     * It can be: "latest" or a tagged release expressed as such: "v2.13.2"
+     * It can be: "latest" or a tagged release expressed as such: "v3.5.5"
      */
-    @WithDefault("v2.13.2")
+    @WithDefault("v3.5.5")
     String version();
 
     /**
