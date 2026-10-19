@@ -1,9 +1,10 @@
 package io.quarkiverse.argocd.v1alpha1.applicationstatus.operationstate.operation.sync.sources;
 
 @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "commonAnnotations", "commonAnnotationsEnvsubst", "commonLabels",
-        "components", "forceCommonAnnotations", "forceCommonLabels", "images", "labelWithoutSelector", "namePrefix",
-        "nameSuffix", "namespace", "patches", "replicas", "version" })
+@com.fasterxml.jackson.annotation.JsonPropertyOrder({ "apiVersions", "commonAnnotations", "commonAnnotationsEnvsubst",
+        "commonLabels", "components", "forceCommonAnnotations", "forceCommonLabels", "ignoreMissingComponents", "images",
+        "kubeVersion", "labelIncludeTemplates", "labelWithoutSelector", "namePrefix", "nameSuffix", "namespace", "patches",
+        "replicas", "version" })
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
 @lombok.ToString()
 @lombok.EqualsAndHashCode()
@@ -23,6 +24,23 @@ public class Kustomize implements io.fabric8.kubernetes.api.builder.Editable<Kus
     @java.lang.Override
     public KustomizeBuilder edit() {
         return new KustomizeBuilder(this);
+    }
+
+    /**
+     * APIVersions specifies the Kubernetes resource API versions to pass to Helm when templating manifests. By default,
+     * Argo CD uses the API versions of the target cluster. The format is [group/]version/kind.
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("apiVersions")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("APIVersions specifies the Kubernetes resource API versions to pass to Helm when templating manifests. By default,\nArgo CD uses the API versions of the target cluster. The format is [group/]version/kind.")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private java.util.List<String> apiVersions;
+
+    public java.util.List<String> getApiVersions() {
+        return apiVersions;
+    }
+
+    public void setApiVersions(java.util.List<String> apiVersions) {
+        this.apiVersions = apiVersions;
     }
 
     /**
@@ -122,6 +140,23 @@ public class Kustomize implements io.fabric8.kubernetes.api.builder.Editable<Kus
     }
 
     /**
+     * IgnoreMissingComponents prevents kustomize from failing when components do not exist locally by not appending them to
+     * kustomization file
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("ignoreMissingComponents")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("IgnoreMissingComponents prevents kustomize from failing when components do not exist locally by not appending them to kustomization file")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private Boolean ignoreMissingComponents;
+
+    public Boolean getIgnoreMissingComponents() {
+        return ignoreMissingComponents;
+    }
+
+    public void setIgnoreMissingComponents(Boolean ignoreMissingComponents) {
+        this.ignoreMissingComponents = ignoreMissingComponents;
+    }
+
+    /**
      * Images is a list of Kustomize image override specifications
      */
     @com.fasterxml.jackson.annotation.JsonProperty("images")
@@ -135,6 +170,39 @@ public class Kustomize implements io.fabric8.kubernetes.api.builder.Editable<Kus
 
     public void setImages(java.util.List<String> images) {
         this.images = images;
+    }
+
+    /**
+     * KubeVersion specifies the Kubernetes API version to pass to Helm when templating manifests. By default, Argo CD
+     * uses the Kubernetes version of the target cluster.
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("kubeVersion")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("KubeVersion specifies the Kubernetes API version to pass to Helm when templating manifests. By default, Argo CD\nuses the Kubernetes version of the target cluster.")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private String kubeVersion;
+
+    public String getKubeVersion() {
+        return kubeVersion;
+    }
+
+    public void setKubeVersion(String kubeVersion) {
+        this.kubeVersion = kubeVersion;
+    }
+
+    /**
+     * LabelIncludeTemplates specifies whether to apply common labels to resource templates or not
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("labelIncludeTemplates")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("LabelIncludeTemplates specifies whether to apply common labels to resource templates or not")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private Boolean labelIncludeTemplates;
+
+    public Boolean getLabelIncludeTemplates() {
+        return labelIncludeTemplates;
+    }
+
+    public void setLabelIncludeTemplates(Boolean labelIncludeTemplates) {
+        this.labelIncludeTemplates = labelIncludeTemplates;
     }
 
     /**
@@ -154,10 +222,10 @@ public class Kustomize implements io.fabric8.kubernetes.api.builder.Editable<Kus
     }
 
     /**
-     * NamePrefix is a prefix appended to resources for Kustomize apps
+     * NamePrefix overrides the namePrefix in the kustomization.yaml for Kustomize apps
      */
     @com.fasterxml.jackson.annotation.JsonProperty("namePrefix")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("NamePrefix is a prefix appended to resources for Kustomize apps")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("NamePrefix overrides the namePrefix in the kustomization.yaml for Kustomize apps")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private String namePrefix;
 
@@ -170,10 +238,10 @@ public class Kustomize implements io.fabric8.kubernetes.api.builder.Editable<Kus
     }
 
     /**
-     * NameSuffix is a suffix appended to resources for Kustomize apps
+     * NameSuffix overrides the nameSuffix in the kustomization.yaml for Kustomize apps
      */
     @com.fasterxml.jackson.annotation.JsonProperty("nameSuffix")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("NameSuffix is a suffix appended to resources for Kustomize apps")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("NameSuffix overrides the nameSuffix in the kustomization.yaml for Kustomize apps")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private String nameSuffix;
 

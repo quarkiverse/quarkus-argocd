@@ -40,11 +40,11 @@ public class Destination implements io.fabric8.kubernetes.api.builder.Editable<D
     }
 
     /**
-     * Namespace specifies the target namespace for the application's resources. The namespace will only be set for
-     * namespace-scoped resources that have not set a value for .metadata.namespace
+     * Namespace specifies the target namespace for the application's resources.
+     * The namespace will only be set for namespace-scoped resources that have not set a value for .metadata.namespace
      */
     @com.fasterxml.jackson.annotation.JsonProperty("namespace")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Namespace specifies the target namespace for the application's resources. The namespace will only be set for namespace-scoped resources that have not set a value for .metadata.namespace")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Namespace specifies the target namespace for the application's resources.\nThe namespace will only be set for namespace-scoped resources that have not set a value for .metadata.namespace")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private String namespace;
 
