@@ -56,7 +56,7 @@ jobs:
         run: jbang --version
 
       - name: Build with Maven
-        run: mvn -B clean install -Dno-format -Dquarkus.ingress.devservices.port-forward-enabled=false
+        run: mvn -B clean install -Dno-format -Dquarkus.argocd.devservices.port-forward-enabled=false
 
       - name: Execute the IT test using kind container
         run: mvn test -Dtest=ArgocdExtensionDevModeIT -Dsurefire.failIfNoSpecifiedTests=false
@@ -98,7 +98,7 @@ jobs:
           quarkus plug ls
           
           echo "## Compile the quarkus app"
-          mvn -B install -Dno-format -Dquarkus.ingress.devservices.port-forward-enabled=false
+          mvn -B install -Dno-format -Dquarkus.argocd.devservices.port-forward-enabled=false
 
           # Troubleshooting information
           ls -al
