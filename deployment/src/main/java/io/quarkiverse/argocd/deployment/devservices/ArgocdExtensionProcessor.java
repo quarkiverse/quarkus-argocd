@@ -12,8 +12,6 @@ import org.testcontainers.containers.GenericContainer;
 
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
-import io.fabric8.kubernetes.api.model.networking.v1.Ingress;
-import io.fabric8.kubernetes.api.model.networking.v1.IngressBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.LocalPortForward;
@@ -96,33 +94,9 @@ public class ArgocdExtensionProcessor {
         Utils.setConfig(argoConfig);
         Utils.setKubernetesClient(client);
 
-        // The ingress-nginx manifest installed is the kind specific one. Other clusters (e.g. k3s) bundle their own ingress controller
-        if ("kind".equals(argoConfig.clusterType())) {
-            // TODO: To be removed when the issue https://github.com/dajudge/kindcontainer/issues/363 is fixed and released in 1.4.9
-            // Patch the node created to add the ingress label
-            // ingress-ready: "true"
-            LOG.info("Patching the node's label to add: ingress-ready: true");
-            client.nodes().withName("kind").edit(
-                    n -> new NodeBuilder(n).editMetadata().addToLabels("ingress-ready", "true").endMetadata().build());
-
-            // Install the ingress controller
-            List<HasMetadata> ingressItems = client.load(Utils.fetchIngressResourcesFromURL(argoConfig.ingress().version()))
-                    .items();
-            LOG.info("Deploying the ingress controller resources ...");
-            for (HasMetadata item : ingressItems) {
-                var res = client.resource(item).create();
-                assertNotNull(res);
-            }
-
-            waitTillPodSelectedByLabelsIsReady(
-                    Map.of(
-                            "app.kubernetes.io/name", "ingress-nginx",
-                            "app.kubernetes.io/component", "controller"),
-                    "ingress-nginx");
-        } else {
-            LOG.infof("Skipping the installation of the ingress-nginx controller for the cluster type: %s",
-                    argoConfig.clusterType());
-        }
+        // Wait till the DNS of the cluster is ready before installing Argo CD: some of its pods (e.g. argocd-redis) fail
+        // and are restarted with an increasing delay when they are created too early after the start of the cluster
+        waitTillPodSelectedByLabelsIsReady(Map.of("k8s-app", "kube-dns"), "kube-system");
 
         var ARGOCD_CONTROLLER_NAMESPACE = argoConfig.controlPlaneNamespace();
         // Install the Argocd resources from the YAML manifest file
@@ -168,36 +142,7 @@ public class ArgocdExtensionProcessor {
         waitTillArgocdPodSelectedByLabelIsReady("app.kubernetes.io/name", ARGOCD_APPLICATIONSET_CONTROLLER_NAME);
         waitTillArgocdPodIsReady(ARGOCD_APP_CONTROLLER_NAME + "-0");
 
-        // Create the Argocd ingress route
-        LOG.info("Creating the ingress route for the argocd server ...");
-        Ingress argocdIngressRoute = new IngressBuilder()
-        // @formatter:off
-                .withNewMetadata()
-                  .withName("argocd")
-                  .withNamespace(ARGOCD_CONTROLLER_NAMESPACE)
-                .endMetadata()
-                .withNewSpec()
-                  .addNewRule()
-                    .withHost(argoConfig.hostName())
-                    .withNewHttp()
-                      .addNewPath()
-                        .withPath("/")
-                        .withPathType("Prefix") // This field is mandatory
-                        .withNewBackend()
-                          .withNewService()
-                            .withName(ARGOCD_SERVER_NAME)
-                            .withNewPort().withName("https").endPort()
-                          .endService()
-                        .endBackend()
-                      .endPath()
-                    .endHttp()
-                  .endRule()
-                .endSpec()
-                .build();
-                // @formatter:on
-        client.resource(argocdIngressRoute).create();
-
-        if (argoConfig.ingress().portForwardEnabled()) {
+        if (argoConfig.portForwardEnabled()) {
             // Port-forward the traffic from host port to pod's container's port
             Pod argocdServerPod = client.pods()
                     .inNamespace(ARGOCD_CONTROLLER_NAMESPACE)
@@ -237,7 +182,7 @@ public class ArgocdExtensionProcessor {
                 new ArgocdDevServiceInfoBuildItem(
                         argoConfig.hostName(),
                         Integer.parseInt(argoConfig.hostPort()),
-                        argoConfig.ingress().portForwardEnabled(),
+                        argoConfig.portForwardEnabled(),
                         argoConfig.version(),
                         "admin",
                         argocd_admin_password));
