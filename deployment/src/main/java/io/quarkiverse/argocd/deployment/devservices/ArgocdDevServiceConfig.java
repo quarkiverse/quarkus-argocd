@@ -56,7 +56,7 @@ public interface ArgocdDevServiceConfig {
     String clusterType();
 
     /**
-     * The hostname of the argocd ingress route
+     * The hostname of the Argo CD UI link of the Dev UI. It must resolve to the local host
      */
     @WithDefault("argocd.localtest.me")
     String hostName();
@@ -68,23 +68,8 @@ public interface ArgocdDevServiceConfig {
     String hostPort();
 
     /**
-     * Ingress configuration
+     * Enable to forward the Argo CD server port to the host port
      */
-    Ingress ingress();
-
-    interface Ingress {
-        /**
-         * The version of the Ingress controller to be installed from the GitHub repository
-         * If not specified, it will use the resources published on main branch
-         * The version to be used should be specified using the tagged release: v1.12.0, etc
-         */
-        @WithDefault("latest")
-        String version();
-
-        /**
-         * Enable to forward the ingress traffic from the container to the local host
-         */
-        @WithDefault("true")
-        boolean portForwardEnabled();
-    }
+    @WithDefault("true")
+    boolean portForwardEnabled();
 }
